@@ -1,0 +1,22 @@
+*Debug
+ipch
+
+*.sdf
+*.suo
+*.aps
+*.user
+*.opendb
+*.db
+*.vscode
+
+/_install
+/.vs
+/CMakeLists.txt.user
+
+# Build directories
+/_build*
+/build*
+/samples/integration_test/_build*
+
+# Temporary Vim files
+*.swp
