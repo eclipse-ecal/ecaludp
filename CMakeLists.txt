@@ -29,6 +29,9 @@ message(STATUS "Module Path: ${CMAKE_MODULE_PATH}")
 message(STATUS "Prefix Path: ${CMAKE_PREFIX_PATH}")
 
 # CMake Options
+option(ECALUDP_ENABLE_UDPCAP
+       "Enable the NPCAP based socket emulation to receive UDP data without actually opening a socket."
+       OFF)
 option(ECALUDP_BUILD_SAMPLES
        "Build project samples."
        ON)
@@ -42,6 +45,11 @@ option(ECALUDP_USE_BUILTIN_ASIO
 option(ECALUDP_USE_BUILTIN_RECYCLE
         "Use the builtin steinwurf::recycle submodule. If set to OFF, recycle must be available from somewhere else (e.g. system libs)."
         ON)
+cmake_dependent_option(ECALUDP_USE_BUILTIN_UDPCAP
+        "Use the builtin udpcap submodule. Only needed if ECALUDP_WITH_UDPCAP is ON. If set to OFF, udpcap must be available from somewhere else (e.g. system libs). Setting this option to ON will also use the default dependencies of udpcap (npcap-sdk, pcapplusplus)."
+        ON                       # Default value if dependency is met
+        "ECALUDP_ENABLE_UDPCAP"  # Dependency
+        OFF)                     # Default value if dependency is not met
 cmake_dependent_option(ECALUDP_USE_BUILTIN_GTEST
         "Use the builtin GoogleTest submodule. Only needed if ECALUDP_BUILD_TESTS is ON. If set to OFF, GoogleTest must be available from somewhere else (e.g. system libs)."
         ON                       # Default value if dependency is met
@@ -61,6 +69,11 @@ endif()
 # Use builtin recycle
 if (ECALUDP_USE_BUILTIN_RECYCLE)
     include("${CMAKE_CURRENT_LIST_DIR}/thirdparty/build-recycle.cmake")
+endif()
+
+# Use builtin recycle
+if (ECALUDP_USE_BUILTIN_UDPCAP)
+    include("${CMAKE_CURRENT_LIST_DIR}/thirdparty/build-udpcap.cmake")
 endif()
 
 # Use builtin gtest
@@ -87,6 +100,10 @@ endif()
 if (ECALUDP_BUILD_TESTS)
     enable_testing()
     add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/tests/ecaludp_test")
+
+    if (ECALUDP_ENABLE_UDPCAP)
+        add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/tests/ecaludp_npcap_test")
+    endif()
 
     # Check if ecaludp is a static lib. We can only add the private tests for
     # static libs and object libs, as we need to have access to the private

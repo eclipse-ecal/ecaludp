@@ -14,7 +14,7 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################################
 
-project(ecaludp_test)
+project(ecaludp_npcap_test)
 
 find_package(Threads REQUIRED)
 find_package(GTest REQUIRED)
@@ -22,8 +22,10 @@ find_package(ecaludp REQUIRED)
 
 set(sources
   src/atomic_signalable.h
-  src/ecaludp_socket_test.cpp
+  src/ecaludp_npcap_socket_test.cpp
 )
+
+message (STATUS "todo remove=========== CMAKE_SIZEOF_VOID_P ${CMAKE_SIZEOF_VOID_P}")
 
 add_executable(${PROJECT_NAME} ${sources})
 

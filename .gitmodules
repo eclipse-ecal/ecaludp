@@ -7,3 +7,6 @@
 [submodule "thirdparty/recycle"]
 	path = thirdparty/recycle
 	url = https://github.com/steinwurf/recycle.git
+[submodule "thirdparty/udpcap"]
+	path = thirdparty/udpcap
+	url = https://github.com/eclipse-ecal/udpcap.git
