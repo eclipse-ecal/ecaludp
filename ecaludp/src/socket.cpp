@@ -77,14 +77,13 @@ namespace ecaludp
 
   class recycle_shared_pool : public recycle::shared_pool<ecaludp::RawMemory, buffer_pool_lock_policy_>{};
 
-
   Socket::Socket(asio::io_service& io_service, std::array<char, 4> magic_header_bytes)
-    : socket_              (io_service)
-    , datagram_buffer_pool_(new recycle_shared_pool()) // TODO: make_unique
-    , reassembly_v5_       (new ecaludp::v5::Reassembly())
-    , magic_header_bytes_  (magic_header_bytes)
+    : socket_               (io_service)
+    , datagram_buffer_pool_ (std::make_unique<ecaludp::recycle_shared_pool>())
+    , reassembly_v5_        (std::make_unique<ecaludp::v5::Reassembly>())
+    , magic_header_bytes_   (magic_header_bytes)
     , max_udp_datagram_size_(1448)
-    , max_reassembly_age_  (std::chrono::seconds(5))
+    , max_reassembly_age_   (std::chrono::seconds(5))
   {}
 
   Socket::~Socket() = default;

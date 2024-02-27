@@ -54,7 +54,6 @@ namespace ecaludp
   bool SocketUdpcap::is_bound() const                                                 { return socket_->isBound(); }
   asio::ip::udp::endpoint SocketUdpcap::local_endpoint()                              { return asio::ip::udp::endpoint(asio::ip::make_address(socket_->localAddress().toString()), socket_->localPort()); }
   bool SocketUdpcap::set_receive_buffer_size(int size)                                { return socket_->setReceiveBufferSize(size); }
-  bool SocketUdpcap::has_pending_datagrams() const                                    { return socket_->hasPendingDatagrams(); }
   bool SocketUdpcap::join_multicast_group(const asio::ip::address_v4& group_address)  { return socket_->joinMulticastGroup(Udpcap::HostAddress(group_address.to_string())); }
   bool SocketUdpcap::leave_multicast_group(const asio::ip::address_v4& group_address) { return socket_->leaveMulticastGroup(Udpcap::HostAddress(group_address.to_string())); }
   void SocketUdpcap::set_multicast_loopback_enabled(bool enabled)                     { socket_->setMulticastLoopbackEnabled(enabled); }
@@ -99,8 +98,6 @@ namespace ecaludp
                                 }
                                 // resize the buffer to the actually received size
                                 buffer->resize(bytes_received);
-
-                                std::cout << "Received " << bytes_received << " bytes from " << sender_address->toString() << ":" << *sender_port << std::endl;
 
                                 // Convert sender address and port to asio
                                 auto sender_endpoint_of_this_datagram = std::make_shared<asio::ip::udp::endpoint>(asio::ip::make_address(sender_address->toString()), *sender_port);
@@ -161,14 +158,7 @@ namespace ecaludp
     // Check the version and invoke the correct handler
     if (header->version == 5)
     {
-      // TODO Remove
-      std::cerr << "===Start handling datagram from sender_endpoint " << sender_endpoint->address().to_string() << ":" << std::to_string(sender_endpoint->port()) << std::endl;
       finished_package = reassembly_v5_->handle_datagram(buffer, sender_endpoint, error);
-
-      if (finished_package)
-      {
-        std::cerr << "==============FINISHED PACKAGE================" << std::endl; // TODO Remove
-      }
     }
     else if (header->version == 6)
     {

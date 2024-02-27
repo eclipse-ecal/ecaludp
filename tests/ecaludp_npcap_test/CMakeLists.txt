@@ -25,8 +25,6 @@ set(sources
   src/ecaludp_npcap_socket_test.cpp
 )
 
-message (STATUS "todo remove=========== CMAKE_SIZEOF_VOID_P ${CMAKE_SIZEOF_VOID_P}")
-
 add_executable(${PROJECT_NAME} ${sources})
 
 target_link_libraries(${PROJECT_NAME}
