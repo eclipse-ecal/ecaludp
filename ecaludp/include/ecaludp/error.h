@@ -38,6 +38,11 @@ namespace ecaludp
       DUPLICATE_DATAGRAM,
       MALFORMED_DATAGRAM,
       MALFORMED_REASSEMBLED_MESSAGE,
+
+      // NPCAP socket specific errors
+      NPCAP_NOT_INITIALIZED,
+      NOT_BOUND,
+      SOCKET_CLOSED,
     };
 
   //////////////////////////////////////////
@@ -69,10 +74,16 @@ namespace ecaludp
       case OK:                                    return "OK";                                            break;
       case GENERIC_ERROR:                         return "Error";                                         break;
 
+      // Receiving
       case UNSUPPORTED_PROTOCOL_VERSION:          return "Unsupported protocol version";                  break;
       case DUPLICATE_DATAGRAM:                    return "Duplicate datagram";                            break;
       case MALFORMED_DATAGRAM:                    return "Malformed datagram";                            break;
       case MALFORMED_REASSEMBLED_MESSAGE:         return "Malformed reassembled message";                 break;
+
+      // NPCAP socket specific errors
+      case NPCAP_NOT_INITIALIZED:                 return "Npcap not initialized";                         break;
+      case NOT_BOUND:                             return "Socket not bound";                              break;
+      case SOCKET_CLOSED:                         return "Socket closed";                                 break;
 
       default:                                    return "Unknown error";
       }

@@ -179,3 +179,69 @@ TEST(EcalUdpSocket, BigMessage)
   work.reset();
   io_thread.join();
 }
+
+TEST(ecalupd, ZeroByteMessage)
+{
+  atomic_signalable<int> received_messages(0);
+    
+  asio::io_context io_context;
+    
+  // Create the sockets
+  ecaludp::Socket       sender_socket  (io_context, {'E', 'C', 'A', 'L'});
+  ecaludp::SocketUdpcap receiver_socket({'E', 'C', 'A', 'L'});
+    
+  // Open the sender_socket
+  {
+    asio::error_code ec;
+    sender_socket.open(asio::ip::udp::v4(), ec);
+    ASSERT_EQ(ec, asio::error_code());
+  }
+    
+  // Bind the receiver_socket
+  {
+    bool success = receiver_socket.bind(asio::ip::udp::endpoint(asio::ip::address_v4::loopback(), 14000));
+    ASSERT_EQ(success, true);
+  }
+    
+  auto work = std::make_unique<asio::io_context::work>(io_context);
+  std::thread io_thread([&io_context]() { io_context.run(); });
+    
+  std::shared_ptr<asio::ip::udp::endpoint> sender_endpoint = std::make_shared<asio::ip::udp::endpoint>();
+  std::shared_ptr<std::string> message_to_send = std::make_shared<std::string>("");
+    
+  // Wait for the next message
+  receiver_socket.async_receive_from(*sender_endpoint
+                                    , [sender_endpoint, &received_messages, message_to_send](const std::shared_ptr<ecaludp::OwningBuffer>& buffer, ecaludp::Error error)
+                                      {
+                                        // No error
+                                        if (error)
+                                        {
+                                          FAIL();
+                                        }
+                                        
+                                        // compare the messages
+                                        std::string received_string(static_cast<const char*>(buffer->data()), buffer->size());
+                                        ASSERT_EQ(received_string, *message_to_send);
+    
+                                        // increment
+                                        received_messages++;
+                                      });
+    
+  // Send a message
+  sender_socket.async_send_to({ asio::buffer(*message_to_send) }
+                              , asio::ip::udp::endpoint(asio::ip::address_v4::loopback()
+                              , 14000)
+                              , [message_to_send](asio::error_code ec)
+                                {
+                                  // No error
+                                  ASSERT_EQ(ec, asio::error_code());
+                                });
+    
+  // Wait for the message to be received
+  received_messages.wait_for([](int received_messages) { return received_messages == 1; }, std::chrono::milliseconds(100));
+
+  ASSERT_EQ(received_messages, 1);
+
+  work.reset();
+  io_thread.join();
+}

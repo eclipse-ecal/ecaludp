@@ -30,17 +30,17 @@ namespace ecaludp
   // udpcap forwarded methods
   /////////////////////////////////////////////////////
   public:
-    bool isValid() const { return udpcap_socket_.isValid(); }
-    bool bind(const Udpcap::HostAddress& local_address, uint16_t local_port); // This also starts the wait thread for async receive
-    bool isBound() const { return udpcap_socket_.isBound(); }
-    Udpcap::HostAddress localAddress() const { return udpcap_socket_.localAddress(); }
-    uint16_t localPort() const { return udpcap_socket_.localPort(); }
-    bool setReceiveBufferSize(int size) { return udpcap_socket_.setReceiveBufferSize(size); }
-    bool joinMulticastGroup(const Udpcap::HostAddress& group_address) { return udpcap_socket_.joinMulticastGroup(group_address); }
-    bool leaveMulticastGroup(const Udpcap::HostAddress& group_address) { return udpcap_socket_.leaveMulticastGroup(group_address); }
-    void setMulticastLoopbackEnabled(bool enabled) { udpcap_socket_.setMulticastLoopbackEnabled(enabled); }
-    bool isMulticastLoopbackEnabled() const { return udpcap_socket_.isMulticastLoopbackEnabled(); }
-    void close();
+    bool isValid                    () const                                   { return udpcap_socket_.isValid(); }
+    bool bind                       (const Udpcap::HostAddress& local_address, uint16_t local_port); // This also starts the wait thread for async receive
+    bool isBound                    () const                                   { return udpcap_socket_.isBound(); }
+    Udpcap::HostAddress localAddress() const                                   { return udpcap_socket_.localAddress(); }
+    uint16_t localPort              () const                                   { return udpcap_socket_.localPort(); }
+    bool setReceiveBufferSize       (int size)                                 { return udpcap_socket_.setReceiveBufferSize(size); }
+    bool joinMulticastGroup         (const Udpcap::HostAddress& group_address) { return udpcap_socket_.joinMulticastGroup(group_address); }
+    bool leaveMulticastGroup        (const Udpcap::HostAddress& group_address) { return udpcap_socket_.leaveMulticastGroup(group_address); }
+    void setMulticastLoopbackEnabled(bool enabled)                             { udpcap_socket_.setMulticastLoopbackEnabled(enabled); }
+    bool isMulticastLoopbackEnabled () const                                   { return udpcap_socket_.isMulticastLoopbackEnabled(); }
+    void close                      ();
 
   /////////////////////////////////////////////////////
   // Public Methods

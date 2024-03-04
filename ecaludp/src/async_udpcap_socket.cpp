@@ -4,6 +4,10 @@
 
 namespace ecaludp
 {
+  /////////////////////////////////////////////////////
+  // Constructor/Destructor
+  /////////////////////////////////////////////////////
+
   AsyncUdpcapSocket::AsyncUdpcapSocket()
     : udpcap_socket_()
     , is_closed(false)
@@ -31,6 +35,7 @@ namespace ecaludp
     async_receive_from_parameters_queue_.push_back({ buffer, max_buffer_size, &sender_address, &sender_port, read_handler });
     wait_thread_trigger_cv_.notify_one();
   }
+
   /////////////////////////////////////////////////////
   // udpcap forwarded methods
   /////////////////////////////////////////////////////

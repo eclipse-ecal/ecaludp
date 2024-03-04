@@ -59,7 +59,6 @@ namespace ecaludp
     bool is_bound() const;
     asio::ip::udp::endpoint local_endpoint();
     bool set_receive_buffer_size(int size);
-    bool has_pending_datagrams() const;
     bool join_multicast_group(const asio::ip::address_v4& group_address);
     bool leave_multicast_group(const asio::ip::address_v4& group_address);
     void set_multicast_loopback_enabled(bool enabled);

@@ -146,7 +146,7 @@ namespace ecaludp
                                               , const std::function<void(const std::shared_ptr<ecaludp::OwningBuffer>&, asio::error_code)>& completion_handler)
   {
     auto datagram_buffer = datagram_buffer_pool_->allocate();
-    datagram_buffer->resize(65535, false); // Max UDP datagram size. Overprovisioning is not required here, so we safe some time and memory.
+    datagram_buffer->resize(65535); // Max UDP datagram size
 
     auto buffer = datagram_buffer_pool_->allocate();
 
