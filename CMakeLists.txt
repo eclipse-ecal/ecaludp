@@ -101,7 +101,7 @@ if (ECALUDP_BUILD_TESTS)
     enable_testing()
     add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/tests/ecaludp_test")
 
-    if (ECALUDP_ENABLE_UDPCAP)
+    if (ECALUDP_ENABLE_NPCAP)
         add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/tests/ecaludp_npcap_test")
     endif()
 
