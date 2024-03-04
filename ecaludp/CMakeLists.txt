@@ -28,8 +28,8 @@ set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
 find_package(asio    REQUIRED)
 find_package(recycle REQUIRED)
 
-message(STATUS "ECALUDP_ENABLE_UDPCAP: ${ECALUDP_ENABLE_UDPCAP}")
-if(ECALUDP_ENABLE_UDPCAP)
+message(STATUS "ECALUDP_ENABLE_NPCAP: ${ECALUDP_ENABLE_NPCAP}")
+if(ECALUDP_ENABLE_NPCAP)
     find_package(udpcap REQUIRED)
 endif()
 
@@ -62,18 +62,19 @@ set(sources
 ###############################################
 # Sources for npcap enabled build
 ###############################################
-list(APPEND includes
-    include_with_udpcap/ecaludp/socket_udpcap.h
-)
+if(ECALUDP_ENABLE_NPCAP)
+    list(APPEND includes
+        include_with_udpcap/ecaludp/socket_udpcap.h
+    )
 
-list(APPEND sources
-    src/socket_udpcap.cpp
-    src/async_udpcap_socket.cpp
-    src/async_udpcap_socket.h
-)
+    list(APPEND sources
+        src/socket_udpcap.cpp
+        src/async_udpcap_socket.cpp
+        src/async_udpcap_socket.h
+    )
+endif()
 
-
-# Build as object library
+# Build as library
 add_library (${PROJECT_NAME} ${ECALUDP_LIBRARY_TYPE}
     ${includes}
     ${sources}
@@ -99,7 +100,7 @@ target_link_libraries(${PROJECT_NAME}
         $<BUILD_INTERFACE:steinwurf::recycle>
         $<$<BOOL:${WIN32}>:ws2_32>
         $<$<BOOL:${WIN32}>:wsock32>
-        $<$<BOOL:${ECALUDP_ENABLE_UDPCAP}>:udpcap::udpcap>
+        $<$<BOOL:${ECALUDP_ENABLE_NPCAP}>:udpcap::udpcap>
 )
 
 target_compile_definitions(${PROJECT_NAME}
@@ -107,7 +108,7 @@ target_compile_definitions(${PROJECT_NAME}
         ASIO_STANDALONE
         _WIN32_WINNT=0x0601
     PUBLIC
-		$<$<BOOL:${ECALUDP_ENABLE_UDPCAP}>:ECALUDP_UDPCAP_ENABLED>
+		$<$<BOOL:${ECALUDP_ENABLE_NPCAP}>:ECALUDP_UDPCAP_ENABLED>
 )
 
 # Check if ecaludp is a static lib. We can only add the private tests for

@@ -825,7 +825,6 @@ TEST_F(FragmentationV5Test, FaultyFragmentedMessages)
   }
 }
 
-// TODO: Test adding faulty datagrams and duplicated datagrams to the reassembly
 // TODO: Test adding messages from more than 1 sender to the reassembly
 
 // Entry point for running the tests

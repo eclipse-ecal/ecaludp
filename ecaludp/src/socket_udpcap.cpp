@@ -92,7 +92,6 @@ namespace ecaludp
                               {
                                 if (error)
                                 {
-                                  std::cerr << "Error receiving: " << error.ToString() << std::endl; // TODO: Remove
                                   completion_handler(nullptr, error);
                                   return;
                                 }
