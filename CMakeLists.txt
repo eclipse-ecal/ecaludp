@@ -48,7 +48,7 @@ option(ECALUDP_USE_BUILTIN_RECYCLE
 cmake_dependent_option(ECALUDP_USE_BUILTIN_UDPCAP
         "Use the builtin udpcap submodule. Only needed if ECALUDP_ENABLE_NPCAP is ON. If set to OFF, udpcap must be available from somewhere else (e.g. system libs). Setting this option to ON will also use the default dependencies of udpcap (npcap-sdk, pcapplusplus)."
         ON                       # Default value if dependency is met
-        "ECALUDP_ENABLE_UDPCAP"  # Dependency
+        "ECALUDP_ENABLE_NPCAP"   # Dependency
         OFF)                     # Default value if dependency is not met
 cmake_dependent_option(ECALUDP_USE_BUILTIN_GTEST
         "Use the builtin GoogleTest submodule. Only needed if ECALUDP_BUILD_TESTS is ON. If set to OFF, GoogleTest must be available from somewhere else (e.g. system libs)."
