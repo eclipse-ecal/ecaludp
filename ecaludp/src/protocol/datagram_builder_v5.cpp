@@ -37,23 +37,37 @@ namespace ecaludp
 
       constexpr size_t header_size = sizeof(ecaludp::v5::Header);
 
-      size_t total_size = 0;
+      // Create a new buffer_sequence that doesn't contain zero-sized buffers
+      std::vector<asio::const_buffer> buffer_sequence_without_zero_sized_buffers;
+      buffer_sequence_without_zero_sized_buffers.reserve(buffer_sequence.size());
       for (const auto& buffer : buffer_sequence)
+      {
+        if (buffer.size() > 0)
+        {
+        buffer_sequence_without_zero_sized_buffers.push_back(buffer);
+        }
+      }
+
+      // Calculate the total size of all buffers
+      size_t total_size = 0;
+      for (const auto& buffer : buffer_sequence_without_zero_sized_buffers)
       {
         total_size += buffer.size();
       }
 
       if ((total_size + header_size) <= max_datagram_size)
       {
+        // Small enough! We can send the entire payload in one datagram
         DatagramList datagram_list;
         datagram_list.reserve(1);
-        datagram_list.emplace_back(create_non_fragmented_datagram(buffer_sequence, magic_header_bytes));
+        datagram_list.emplace_back(create_non_fragmented_datagram(buffer_sequence_without_zero_sized_buffers, magic_header_bytes));
 
         return datagram_list;
       }
       else
       {
-        return create_fragmented_datagram_list(buffer_sequence, max_datagram_size, magic_header_bytes);
+        // Too big! We need to fragment the payload
+        return create_fragmented_datagram_list(buffer_sequence_without_zero_sized_buffers, max_datagram_size, magic_header_bytes);
       }
     }
 

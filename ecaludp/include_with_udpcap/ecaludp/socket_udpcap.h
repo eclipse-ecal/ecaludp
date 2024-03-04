@@ -54,16 +54,16 @@ namespace ecaludp
   // API "Passthrough" (and a bit conversion to asio types)
   /////////////////////////////////////////////////////////////////
   public:
-    bool is_valid() const;
-    bool bind(const asio::ip::udp::endpoint& sender_endpoint);
-    bool is_bound() const;
-    asio::ip::udp::endpoint local_endpoint();
-    bool set_receive_buffer_size(int size);
-    bool join_multicast_group(const asio::ip::address_v4& group_address);
-    bool leave_multicast_group(const asio::ip::address_v4& group_address);
-    void set_multicast_loopback_enabled(bool enabled);
-    bool is_multicast_loopback_enabled() const;
-    void close();
+    ECALUDP_EXPORT bool is_valid() const;
+    ECALUDP_EXPORT bool bind(const asio::ip::udp::endpoint& sender_endpoint);
+    ECALUDP_EXPORT bool is_bound() const;
+    ECALUDP_EXPORT asio::ip::udp::endpoint local_endpoint();
+    ECALUDP_EXPORT bool set_receive_buffer_size(int size);
+    ECALUDP_EXPORT bool join_multicast_group(const asio::ip::address_v4& group_address);
+    ECALUDP_EXPORT bool leave_multicast_group(const asio::ip::address_v4& group_address);
+    ECALUDP_EXPORT void set_multicast_loopback_enabled(bool enabled);
+    ECALUDP_EXPORT bool is_multicast_loopback_enabled() const;
+    ECALUDP_EXPORT void close();
 
   /////////////////////////////////////////////////////////////////
   // Receiving
