@@ -77,6 +77,5 @@ namespace ecaludp
     std::mutex                   wait_thread_trigger_mutex_;
     std::condition_variable      wait_thread_trigger_cv_;
     std::deque<AsyncReceiveFromParameters> async_receive_from_parameters_queue_;
-    bool                         is_closed;
   };
 }

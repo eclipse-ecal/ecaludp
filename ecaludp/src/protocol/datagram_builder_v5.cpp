@@ -181,7 +181,6 @@ namespace ecaludp
                 && (offset_in_current_buffer < buffer_sequence[buffer_index].size()))))
       {
         // Create a new datagram, if the last one is full, or if this is the first real datagram (besides the fragmentation info)
-        // TODO: Only add a new datagram, if there are more bytes to be sent. The next buffer MAY be empty, so we don't need to add a new datagram.
         if ((datagram_list.size() <= 1)
           || (datagram_list.back().size() >= max_udp_datagram_size))
         {
@@ -206,9 +205,6 @@ namespace ecaludp
           // Add an asio buffer for the header buffer
           datagram_list.back().asio_buffer_list_.emplace_back(datagram_list.back().header_buffer_.data(), datagram_list.back().header_buffer_.size());
         }
-
-        // TODO: Handle 0-byte-buffers. Those can be discarded directly
-        // TODO: Also test the 0-byte-buffers.
 
         // Compute how many bytes from the current buffer we can fit in the datagram
         const size_t bytes_to_fit_in_current_datagram = std::min(max_udp_datagram_size - datagram_list.back().size(), buffer_sequence[buffer_index].size() - offset_in_current_buffer);
