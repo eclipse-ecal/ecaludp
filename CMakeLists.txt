@@ -83,7 +83,7 @@ endif()
 
 # For tests we need to make sure that all shared libraries and executables are 
 # put into the same directory. Otherwise the tests will fail on windows.
-if(ECALUDP_BUILD_TESTS AND BUILD_SHARED_LIBS AND ECALUDP_USE_BUILTIN_GTEST)
+if(ECALUDP_BUILD_TESTS AND (BUILD_SHARED_LIBS OR (ECALUDP_LIBRARY_TYPE STREQUAL "SHARED")))
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 endif()
 
