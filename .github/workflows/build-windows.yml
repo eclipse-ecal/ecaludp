@@ -16,6 +16,7 @@ jobs:
   build-windows:
 
     strategy:
+      fail-fast: false
       matrix:
         library_type:  [static, shared, object]
         build_arch:    [x64, win32]
