@@ -122,6 +122,19 @@ if (ecaludp_target_type STREQUAL OBJECT_LIBRARY)
     )
 endif()
 
+# If this library is NOT a shared lib (i.e. it is a static or object lib), we
+# need to re-add the DELAYLOAD wpcap.dll. Usually this is exported by udpcap,
+# but we link against that PRIVATE, so we need to re-add this specific setting,
+# that must be carried along the linkage until we hit a DLL or EXE.
+if (${ECALUDP_ENABLE_NPCAP})
+    if (NOT ecaludp_target_type STREQUAL SHARED_LIBRARY)
+        set_target_properties(${PROJECT_NAME}
+            PROPERTIES INTERFACE_LINK_OPTIONS
+            -DELAYLOAD:wpcap.dll
+        )
+    endif()
+endif()
+
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_14)
 
 target_compile_options(${PROJECT_NAME} PRIVATE
