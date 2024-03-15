@@ -18,6 +18,15 @@ cmake_minimum_required(VERSION 3.13)
 
 project(integration_test)
 
+include("${CMAKE_CURRENT_LIST_DIR}/../../thirdparty/build-asio.cmake")
+
+################################################################################
+# Add udpcap for static compiling, again
+if (INTEGRATION_TEST_INCLUDE_UDPCAP)
+  include("${CMAKE_CURRENT_LIST_DIR}/../../thirdparty/build-udpcap.cmake")
+endif()
+################################################################################
+
 find_package(Threads REQUIRED)
 find_package(ecaludp REQUIRED)
 

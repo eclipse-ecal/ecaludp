@@ -100,7 +100,7 @@ jobs:
       run: |
            cmake --build ${{github.workspace}}/_build --config Debug --parallel
            
-    - name: Install (Release)
+    - name: Install (Debug)
       shell: cmd
       run: |
            cmake --build ${{github.workspace}}/_build --config Debug --target INSTALL
@@ -134,9 +134,19 @@ jobs:
             $module_path="${{github.workspace}}/thirdparty/asio-module"
             $module_path_posix=$module_path.Replace('\', '/')
 
+            if ( '${{ matrix.library_type }}' -eq 'static' )
+            {
+              $use_udpcap = 'ON'
+            }
+            else
+            {
+              $use_udpcap = 'OFF'
+            }
+
             cmake -B "${{github.workspace}}/samples/integration_test/_build" `
                   -A ${{ matrix.build_arch }} `
                   -DCMAKE_PREFIX_PATH="${{github.workspace}}/${{env.INSTALL_PREFIX}}" `
+                  -DINTEGRATION_TEST_INCLUDE_UDPCAP=$use_udpcap `
                   -DCMAKE_MODULE_PATH="$module_path_posix"
 
       working-directory: ${{ github.workspace }}/samples/integration_test
