@@ -44,7 +44,7 @@ namespace ecaludp
       {
         if (buffer.size() > 0)
         {
-        buffer_sequence_without_zero_sized_buffers.push_back(buffer);
+          buffer_sequence_without_zero_sized_buffers.push_back(buffer);
         }
       }
 

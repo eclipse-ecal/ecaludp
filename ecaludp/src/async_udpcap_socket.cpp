@@ -66,8 +66,6 @@ namespace ecaludp
   {
     while (true)
     {
-      //TODO: Revise this function, it is very important, but currently not safe.
-
       AsyncReceiveFromParameters next_async_receive_from_parameters{};
 
       // Wait until there is somebody requesting some data. This is done by waiting for the callback queue to be non-empty.
