@@ -27,22 +27,6 @@
 
 #include <protocol/portable_endian.h>
 
-// Define your test fixture
-class FragmentationV5Test : public ::testing::Test {
-protected:
-  // Set up the test fixture
-  void SetUp() override
-  {
-    // Code to set up the test fixture
-  }
-
-  // Tear down the test fixture
-  void TearDown() override
-  {
-    // Code to tear down the test fixture
-  }
-};
-
 std::shared_ptr<ecaludp::RawMemory> to_binary_buffer(const ecaludp::DatagramDescription& datagram_description)
 {
   std::shared_ptr<ecaludp::RawMemory> buffer = std::make_shared<ecaludp::RawMemory>();
@@ -60,7 +44,7 @@ std::shared_ptr<ecaludp::RawMemory> to_binary_buffer(const ecaludp::DatagramDesc
 }
 
 // Check "Fragmentation" and "Defragmentation" of a single normal message that is smaller than the MTU, i.e. no fragmentation is needed
-TEST_F(FragmentationV5Test, NonFragmentedMessage)
+TEST(FragmentationV5Test, NonFragmentedMessage)
 {
   // Create a Hello World string
   std::string hello_world = "Hello World!";
@@ -114,7 +98,7 @@ TEST_F(FragmentationV5Test, NonFragmentedMessage)
 }
 
 // Check the fragmentation and defragmentation of a single message that is larger than the MTU
-TEST_F(FragmentationV5Test, FragmentedMessage)
+TEST(FragmentationV5Test, FragmentedMessage)
 {
   // Create a longer string
   auto message_to_send = std::string("In the beginning the Universe was created. This had made many people very angry and has been widely regarded as a bad move.");
@@ -212,7 +196,7 @@ TEST_F(FragmentationV5Test, FragmentedMessage)
 }
 
 // Check the defragmentation of a long message that is larger than the MTU and arrives out of order
-TEST_F(FragmentationV5Test, OutOfOrderFragments)
+TEST(FragmentationV5Test, OutOfOrderFragments)
 {
   // Create a longer string
   auto message_to_send = std::string("In the beginning the Universe was created. This had made many people very angry and has been widely regarded as a bad move.");
@@ -285,7 +269,7 @@ TEST_F(FragmentationV5Test, OutOfOrderFragments)
 }
 
 // Check the handling of a 1-fragment-message (i.e. a message that is small enough to fit into a single datagram, but is still fragmented)
-TEST_F(FragmentationV5Test, SingleFragmentFragmentation)
+TEST(FragmentationV5Test, SingleFragmentFragmentation)
 {
   // Create a Hello World string
   std::string hello_world = "Hello World!";
@@ -362,7 +346,7 @@ TEST_F(FragmentationV5Test, SingleFragmentFragmentation)
 }
 
 // Check "Fragmentation" and "Defragmentation" of a 0-byte message
-TEST_F(FragmentationV5Test, ZeroByteMessage)
+TEST(FragmentationV5Test, ZeroByteMessage)
 {
   // Create a 0-byte string
   std::string zero_byte_string;
@@ -413,7 +397,7 @@ TEST_F(FragmentationV5Test, ZeroByteMessage)
 }
 
 // Check Fragmentation and defragmentation of a muli-buffer-message
-TEST_F(FragmentationV5Test, MultiBufferFragmentation)
+TEST(FragmentationV5Test, MultiBufferFragmentation)
 {
   auto message_to_send_1 = std::make_shared<std::string>("In the beginning the Universe was created.");
   auto message_to_send_2 = std::make_shared<std::string>(" ");
@@ -505,7 +489,7 @@ TEST_F(FragmentationV5Test, MultiBufferFragmentation)
 }
 
 // Test if a tailing zero-buffer will create a new fragment (it shouldn't)
-TEST_F(FragmentationV5Test, MultiBufferWithTailingZeroBuffer)
+TEST(FragmentationV5Test, MultiBufferWithTailingZeroBuffer)
 {
   auto message_to_send_1 = std::make_shared<std::string>("Hello World!");
   auto message_to_send_2 = std::make_shared<std::string>("");
@@ -566,7 +550,8 @@ TEST_F(FragmentationV5Test, MultiBufferWithTailingZeroBuffer)
   }
 }
 
-TEST_F(FragmentationV5Test, Cleanup)
+// Test whether "too old" packages are removed from the reassembly
+TEST(FragmentationV5Test, Cleanup)
 {
   // Create 2 messages that are the same size
   auto message_1 = std::make_shared<std::string>("In the beginning the Universe was created.");
@@ -679,7 +664,7 @@ TEST_F(FragmentationV5Test, Cleanup)
   }
 }
 
-TEST_F(FragmentationV5Test, FaultyFragmentedMessages)
+TEST(FragmentationV5Test, FaultyFragmentedMessages)
 {
   // Create a longer string
   auto message_to_send = std::string("In the beginning the Universe was created. This had made many people very angry and has been widely regarded as a bad move.");
@@ -826,10 +811,3 @@ TEST_F(FragmentationV5Test, FaultyFragmentedMessages)
 }
 
 // TODO: Test adding messages from more than 1 sender to the reassembly
-
-// Entry point for running the tests
-int main(int argc, char** argv)
-{
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}
