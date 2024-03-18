@@ -5,8 +5,6 @@
 #include "protocol/header_common.h"
 #include "protocol/reassembly_v5.h"
 
-#include <iostream> // TODO: remove
-
 namespace ecaludp
 {
   
@@ -104,13 +102,6 @@ namespace ecaludp
                                 // Handle the datagram
                                 ecaludp::Error datagam_handle_error = ecaludp::Error::ErrorCode::GENERIC_ERROR;
                                 auto completed_package = this->handle_datagram(buffer, sender_endpoint_of_this_datagram, datagam_handle_error);
-
-                                // TODO: Remove
-                                if (datagam_handle_error)
-                                {
-                                  std::cerr << "Error handling datagram: " << datagam_handle_error.ToString() << std::endl;
-                                  return;
-                                }
 
                                 if (completed_package != nullptr)
                                 {

@@ -1,7 +1,5 @@
 #include "async_udpcap_socket.h"
 
-#include <iostream> // TODO: Remove
-
 namespace ecaludp
 {
   /////////////////////////////////////////////////////
@@ -14,14 +12,14 @@ namespace ecaludp
 
   AsyncUdpcapSocket::~AsyncUdpcapSocket()
   {
+    // Close the socket and un-block the wait thread
     close();
-    // TODO: Stop the socket and the wait thread
+
+    // Join the wait thread
     if (wait_thread_)
     {
       wait_thread_->join();
     }
-
-    // TODO: implement
   }
 
   void AsyncUdpcapSocket::asyncReceiveFrom( char*                buffer
