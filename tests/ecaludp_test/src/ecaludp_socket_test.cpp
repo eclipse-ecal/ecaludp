@@ -16,11 +16,18 @@
 
 #include <gtest/gtest.h>
 
-#include <asio.hpp>
+#include <asio.hpp> // IWYU pragma: keep
 
 #include <ecaludp/socket.h>
 
 #include "atomic_signalable.h"
+
+#include <algorithm>
+#include <chrono>
+#include <cstdlib>
+#include <memory>
+#include <string>
+#include <thread>
 
 TEST(EcalUdpSocket, HelloWorldMessage)
 {

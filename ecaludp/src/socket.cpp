@@ -14,29 +14,28 @@
  * SPDX-License-Identifier: Apache-2.0
  ********************************************************************************/
 #include <array>
+#include <chrono>
 #include <cstddef>
 #include <cstring>
-#include <ecaludp/socket.h>
-
 #include <functional>
+#include <memory>
+#include <mutex>
+#include <recycle/shared_pool.hpp>
+#include <stdexcept>
+#include <string>
+#include <vector>
 
-#include <asio.hpp>
+#include <asio.hpp> // IWYU pragma: keep
 
 #include "ecaludp/error.h"
 #include "ecaludp/raw_memory.h"
 #include "protocol/datagram_builder_v5.h"
 #include "protocol/datagram_description.h"
 #include "protocol/header_common.h"
-
 #include "protocol/reassembly_v5.h"
 
 #include <ecaludp/owning_buffer.h>
-
-#include <memory>
-#include <mutex>
-#include <recycle/shared_pool.hpp>
-#include <string>
-#include <vector>
+#include <ecaludp/socket.h>
 
 namespace ecaludp
 {

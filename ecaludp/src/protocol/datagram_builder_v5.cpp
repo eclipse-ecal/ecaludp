@@ -19,7 +19,9 @@
 #include "header_v5.h"
 #include "portable_endian.h"
 #include "protocol/datagram_description.h"
+
 #include <algorithm>
+#include <array>
 #include <chrono>
 #include <cstddef>
 #include <cstdint>

@@ -50,7 +50,7 @@ namespace ecaludp
                          , size_t               max_buffer_size
                          , Udpcap::HostAddress& sender_address
                          , uint16_t&            sender_port
-                         , const std::function<void(ecaludp::Error, size_t)>& read_handler);
+                         , const std::function<void(ecaludp::Error&, size_t)>& read_handler);
 
   /////////////////////////////////////////////////////
   // Wait thread function
@@ -68,7 +68,7 @@ namespace ecaludp
       size_t                max_buffer_size_;
       Udpcap::HostAddress*  sender_address_;
       uint16_t*             sender_port_;
-      std::function<void(ecaludp::Error, size_t)> read_handler_;
+      std::function<void(ecaludp::Error&, size_t)> read_handler_;
     };
 
     Udpcap::UdpcapSocket         udpcap_socket_;

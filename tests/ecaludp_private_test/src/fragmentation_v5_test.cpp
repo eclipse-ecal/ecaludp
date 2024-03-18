@@ -17,15 +17,23 @@
 #include <gtest/gtest.h>
 
 #include <chrono>
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <memory>
+#include <string>
 #include <thread>
 
 #include <asio.hpp>
 
-#include <protocol/datagram_builder_v5.h>
-#include <protocol/reassembly_v5.h>
-#include <protocol/header_v5.h>
+#include <ecaludp/error.h>
+#include <ecaludp/raw_memory.h>
 
+#include <protocol/datagram_builder_v5.h>
+#include <protocol/datagram_description.h>
+#include <protocol/header_v5.h>
 #include <protocol/portable_endian.h>
+#include <protocol/reassembly_v5.h>
 
 std::shared_ptr<ecaludp::RawMemory> to_binary_buffer(const ecaludp::DatagramDescription& datagram_description)
 {

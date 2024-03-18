@@ -1,14 +1,25 @@
 #include "async_udpcap_socket.h"
 
+#include <condition_variable>
+#include <cstddef>
+#include <cstdint>
+#include <deque>
+#include <functional>
+#include <memory>
+#include <mutex>
+#include <thread>
+
+#include <udpcap/udpcap_socket.h>
+
+#include <ecaludp/error.h>
+
 namespace ecaludp
 {
   /////////////////////////////////////////////////////
   // Constructor/Destructor
   /////////////////////////////////////////////////////
 
-  AsyncUdpcapSocket::AsyncUdpcapSocket()
-    : udpcap_socket_()
-  {}
+  AsyncUdpcapSocket::AsyncUdpcapSocket() = default;
 
   AsyncUdpcapSocket::~AsyncUdpcapSocket()
   {
@@ -26,9 +37,9 @@ namespace ecaludp
                                           , size_t               max_buffer_size
                                           , Udpcap::HostAddress& sender_address
                                           , uint16_t&            sender_port
-                                          , const std::function<void(ecaludp::Error, size_t)>& read_handler)
+                                          , const std::function<void(ecaludp::Error&, size_t)>& read_handler)
   {
-    std::unique_lock<std::mutex> lock(wait_thread_trigger_mutex_);
+    const std::unique_lock<std::mutex> lock(wait_thread_trigger_mutex_);
     async_receive_from_parameters_queue_.push_back({ buffer, max_buffer_size, &sender_address, &sender_port, read_handler });
     wait_thread_trigger_cv_.notify_one();
   }
@@ -38,7 +49,7 @@ namespace ecaludp
   /////////////////////////////////////////////////////
   bool AsyncUdpcapSocket::bind(const Udpcap::HostAddress& local_address, uint16_t local_port)
   {
-    bool success = udpcap_socket_.bind(local_address, local_port);
+    const bool success = udpcap_socket_.bind(local_address, local_port);
 
     if (success)
     {
@@ -57,7 +68,7 @@ namespace ecaludp
   {
     udpcap_socket_.close();
     {
-      std::lock_guard<std::mutex> lock(wait_thread_trigger_mutex_);
+      const std::lock_guard<std::mutex> lock(wait_thread_trigger_mutex_);
       wait_thread_trigger_cv_.notify_one();
     }
   }
@@ -88,11 +99,11 @@ namespace ecaludp
     
 
       Udpcap::Error error = Udpcap::Error::GENERIC_ERROR;
-      size_t rec_bytes = udpcap_socket_.receiveDatagram(next_async_receive_from_parameters.buffer_
-                                                      , next_async_receive_from_parameters.max_buffer_size_
-                                                      , next_async_receive_from_parameters.sender_address_
-                                                      , next_async_receive_from_parameters.sender_port_
-                                                      , error);
+      const size_t rec_bytes = udpcap_socket_.receiveDatagram(next_async_receive_from_parameters.buffer_
+                                                            , next_async_receive_from_parameters.max_buffer_size_
+                                                            , next_async_receive_from_parameters.sender_address_
+                                                            , next_async_receive_from_parameters.sender_port_
+                                                            , error);
           
       // Convert from Udpcap Error to ecaludp Error
       ecaludp::Error ecaludp_error = ecaludp::Error::GENERIC_ERROR;

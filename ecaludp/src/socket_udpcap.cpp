@@ -1,9 +1,27 @@
 #include <ecaludp/socket_udpcap.h>
 
+#include <array>
+#include <chrono>
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <functional>
+#include <memory>
+#include <mutex>
+#include <string>
+
+#include <ecaludp/error.h>
+#include <ecaludp/owning_buffer.h>
+#include <ecaludp/raw_memory.h>
+
+#include <udpcap/host_address.h>
+
 #include "async_udpcap_socket.h"
 
 #include "protocol/header_common.h"
 #include "protocol/reassembly_v5.h"
+
+#include <recycle/shared_pool.hpp>
 
 namespace ecaludp
 {
@@ -28,8 +46,7 @@ namespace ecaludp
   {}
 
   // Destructor
-  SocketUdpcap::~SocketUdpcap()
-  {}
+  SocketUdpcap::~SocketUdpcap() = default;
 
   /////////////////////////////////////////////////////////////////
   // Settings
@@ -86,7 +103,7 @@ namespace ecaludp
                             , buffer->size()
                             , *sender_address
                             , *sender_port
-                            , [this, buffer, completion_handler, sender_address, sender_port, &sender_endpoint](ecaludp::Error& error, std::size_t bytes_received)
+                            , [this, buffer, completion_handler, sender_address, sender_port, &sender_endpoint](ecaludp::Error& error, size_t bytes_received)
                               {
                                 if (error)
                                 {

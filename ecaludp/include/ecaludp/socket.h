@@ -16,18 +16,20 @@
 #pragma once
 
 #include <array>
+#include <chrono>
 #include <cstddef>
 #include <functional>
 #include <memory>
+#include <vector>
 
 #include <asio.hpp>
 
+// IWYU pragma: begin_exports
+#include <ecaludp/ecaludp_export.h>
 #include <ecaludp/error.h>
 #include <ecaludp/owning_buffer.h>
 #include <ecaludp/raw_memory.h>
-#include <vector>
-
-#include <ecaludp/ecaludp_export.h>
+// IWYU pragma: end_exports
 
 namespace ecaludp
 {

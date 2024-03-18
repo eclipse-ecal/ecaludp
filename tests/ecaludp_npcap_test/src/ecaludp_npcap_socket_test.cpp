@@ -16,6 +16,13 @@
 
 #include <gtest/gtest.h>
 
+#include <algorithm>
+#include <chrono>
+#include <cstdlib>
+#include <memory>
+#include <string>
+#include <thread>
+
 #include <asio.hpp>
 
 #include <ecaludp/socket.h>

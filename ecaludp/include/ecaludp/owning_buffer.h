@@ -76,8 +76,8 @@ namespace ecaludp
     }
 
   private:
-    const void*                       data_;                ///< The pointer to the internal data
-    const size_t                      size_;                ///< The size of the internal data
-    const std::shared_ptr<void const> owning_container_;    ///< A shared pointer that owns the internal data
+    const void*                 data_;                ///< The pointer to the internal data
+    size_t                      size_;                ///< The size of the internal data
+    std::shared_ptr<void const> owning_container_;    ///< A shared pointer that owns the internal data
   };
 }
