@@ -16,7 +16,7 @@
 
 cmake_minimum_required(VERSION 3.13)
 
-project(integration_test)
+project(integration_test_npcap)
 
 include("${CMAKE_CURRENT_LIST_DIR}/../../thirdparty/build-asio.cmake")
 
