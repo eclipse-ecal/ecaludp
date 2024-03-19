@@ -35,7 +35,11 @@ namespace ecaludp
 
     DatagramList create_datagram_list(const std::vector<asio::const_buffer>& buffer_sequence, size_t max_datagram_size, std::array<char, 4> magic_header_bytes)
     {
-      // TODO: Complain when the max_udp_datagram_size is too small (the header doesn't even fit)
+      // Complain when the max_udp_datagram_size is too small (the header doesn't even fit)
+      if (max_datagram_size <= sizeof(ecaludp::v5::Header))
+      {
+        throw std::invalid_argument("max_datagram_size is too small");
+      }
 
       constexpr size_t header_size = sizeof(ecaludp::v5::Header);
 
