@@ -24,7 +24,7 @@
 int main()
 {
   // Create a socket
-  ecaludp::SocketNpcap socket(io_context, {'E', 'C', 'A', 'L'});
+  ecaludp::SocketNpcap socket({'E', 'C', 'A', 'L'});
 
   // Bind the socket
   bool success = socket.bind(asio::ip::udp::endpoint(asio::ip::address_v4::loopback(), 14000));
