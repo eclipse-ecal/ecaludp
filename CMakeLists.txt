@@ -90,13 +90,18 @@ endif()
 # Add main ecaludp library
 add_subdirectory(ecaludp)
 
-# Add the ecaludp dummy module
+# Add the ecaludp dummy module (for finding ecaludp::ecaludp within this build)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/ecaludp-module)
 
+# Add samples, if enabled
 if (ECALUDP_BUILD_SAMPLES)
     add_subdirectory(samples/ecaludp_sample)
+    if (ECALUDP_ENABLE_NPCAP)
+        add_subdirectory(samples/ecaludp_sample_npcap)
+    endif()
 endif()
 
+# Add Tests if enabled
 if (ECALUDP_BUILD_TESTS)
     enable_testing()
     add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/tests/ecaludp_test")
