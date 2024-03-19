@@ -26,27 +26,27 @@
 #include <asio.hpp>
 
 #include <ecaludp/socket.h>
-#include <ecaludp/socket_udpcap.h>
+#include <ecaludp/socket_npcap.h>
 
 #include "atomic_signalable.h"
 
 TEST(EcalUdpNpcapSocket, RAII_unbound)
 {
   // Create the socket and destroy it
-  ecaludp::SocketUdpcap receiver_socket({'E', 'C', 'A', 'L'});
+  ecaludp::SocketNpcap receiver_socket({'E', 'C', 'A', 'L'});
 }
 
 TEST(EcalUdpNpcapSocket, RAII_bound)
 {
   // Create the socket, bind and destroy it
-  ecaludp::SocketUdpcap receiver_socket({'E', 'C', 'A', 'L'});
+  ecaludp::SocketNpcap receiver_socket({'E', 'C', 'A', 'L'});
   receiver_socket.bind(asio::ip::udp::endpoint(asio::ip::address_v4::loopback(), 14000));
 }
 
 TEST(EcalUdpNpcapSocket, RAII_close)
 {
   // Create the socket, bind and close it
-  ecaludp::SocketUdpcap receiver_socket({'E', 'C', 'A', 'L'});
+  ecaludp::SocketNpcap receiver_socket({'E', 'C', 'A', 'L'});
   receiver_socket.bind(asio::ip::udp::endpoint(asio::ip::address_v4::loopback(), 14000));
   receiver_socket.close();
 }
@@ -58,8 +58,8 @@ TEST(EcalUdpNpcapSocket, HelloWorldMessage)
   asio::io_context io_context;
 
   // Create the sockets
-  ecaludp::Socket       sender_socket  (io_context, {'E', 'C', 'A', 'L'});
-  ecaludp::SocketUdpcap receiver_socket({'E', 'C', 'A', 'L'});
+  ecaludp::Socket      sender_socket  (io_context, {'E', 'C', 'A', 'L'});
+  ecaludp::SocketNpcap receiver_socket({'E', 'C', 'A', 'L'});
 
   // Open the sender_socket
   {
@@ -126,7 +126,7 @@ TEST(EcalUdpSocket, BigMessage)
 
   // Create the sockets
   ecaludp::Socket       sender_socket  (io_context, {'E', 'C', 'A', 'L'});
-  ecaludp::SocketUdpcap receiver_socket({'E', 'C', 'A', 'L'});
+  ecaludp::SocketNpcap receiver_socket({'E', 'C', 'A', 'L'});
 
   // Open the sender_socket
   {
@@ -195,7 +195,7 @@ TEST(ecalupd, ZeroByteMessage)
     
   // Create the sockets
   ecaludp::Socket       sender_socket  (io_context, {'E', 'C', 'A', 'L'});
-  ecaludp::SocketUdpcap receiver_socket({'E', 'C', 'A', 'L'});
+  ecaludp::SocketNpcap receiver_socket({'E', 'C', 'A', 'L'});
     
   // Open the sender_socket
   {

@@ -1,4 +1,4 @@
-#include <ecaludp/socket_udpcap.h>
+#include <ecaludp/socket_npcap.h>
 
 #include <array>
 #include <chrono>
@@ -37,7 +37,7 @@ namespace ecaludp
   /////////////////////////////////////////////////////////////////
   // Constructor
   /////////////////////////////////////////////////////////////////
-  SocketUdpcap::SocketUdpcap(std::array<char, 4> magic_header_bytes)
+  SocketNpcap::SocketNpcap(std::array<char, 4> magic_header_bytes)
     : socket_              (std::make_unique<ecaludp::AsyncUdpcapSocket>())
     , datagram_buffer_pool_(std::make_unique<recycle_shared_pool>())
     , reassembly_v5_       (std::make_unique<ecaludp::v5::Reassembly>())
@@ -46,17 +46,17 @@ namespace ecaludp
   {}
 
   // Destructor
-  SocketUdpcap::~SocketUdpcap() = default;
+  SocketNpcap::~SocketNpcap() = default;
 
   /////////////////////////////////////////////////////////////////
   // Settings
   /////////////////////////////////////////////////////////////////
-  void SocketUdpcap::set_max_reassembly_age(std::chrono::steady_clock::duration max_reassembly_age)
+  void SocketNpcap::set_max_reassembly_age(std::chrono::steady_clock::duration max_reassembly_age)
   {
     max_reassembly_age_ = max_reassembly_age;
   }
 
-  std::chrono::steady_clock::duration SocketUdpcap::get_max_reassembly_age() const
+  std::chrono::steady_clock::duration SocketNpcap::get_max_reassembly_age() const
   {
     return max_reassembly_age_;
   }
@@ -64,28 +64,28 @@ namespace ecaludp
   /////////////////////////////////////////////////////////////////
   // API "Passthrough" (and a bit conversion to asio types)
   /////////////////////////////////////////////////////////////////
-  bool SocketUdpcap::is_valid() const                                                 { return socket_->isValid(); }
-  bool SocketUdpcap::bind(const asio::ip::udp::endpoint& sender_endpoint)             { return socket_->bind(Udpcap::HostAddress(sender_endpoint.address().to_string()), sender_endpoint.port()); }
-  bool SocketUdpcap::is_bound() const                                                 { return socket_->isBound(); }
-  asio::ip::udp::endpoint SocketUdpcap::local_endpoint()                              { return asio::ip::udp::endpoint(asio::ip::make_address(socket_->localAddress().toString()), socket_->localPort()); }
-  bool SocketUdpcap::set_receive_buffer_size(int size)                                { return socket_->setReceiveBufferSize(size); }
-  bool SocketUdpcap::join_multicast_group(const asio::ip::address_v4& group_address)  { return socket_->joinMulticastGroup(Udpcap::HostAddress(group_address.to_string())); }
-  bool SocketUdpcap::leave_multicast_group(const asio::ip::address_v4& group_address) { return socket_->leaveMulticastGroup(Udpcap::HostAddress(group_address.to_string())); }
-  void SocketUdpcap::set_multicast_loopback_enabled(bool enabled)                     { socket_->setMulticastLoopbackEnabled(enabled); }
-  bool SocketUdpcap::is_multicast_loopback_enabled() const                            { return socket_->isMulticastLoopbackEnabled(); }
-  void SocketUdpcap::close()                                                          { socket_->close(); }
+  bool SocketNpcap::is_valid() const                                                 { return socket_->isValid(); }
+  bool SocketNpcap::bind(const asio::ip::udp::endpoint& sender_endpoint)             { return socket_->bind(Udpcap::HostAddress(sender_endpoint.address().to_string()), sender_endpoint.port()); }
+  bool SocketNpcap::is_bound() const                                                 { return socket_->isBound(); }
+  asio::ip::udp::endpoint SocketNpcap::local_endpoint()                              { return asio::ip::udp::endpoint(asio::ip::make_address(socket_->localAddress().toString()), socket_->localPort()); }
+  bool SocketNpcap::set_receive_buffer_size(int size)                                { return socket_->setReceiveBufferSize(size); }
+  bool SocketNpcap::join_multicast_group(const asio::ip::address_v4& group_address)  { return socket_->joinMulticastGroup(Udpcap::HostAddress(group_address.to_string())); }
+  bool SocketNpcap::leave_multicast_group(const asio::ip::address_v4& group_address) { return socket_->leaveMulticastGroup(Udpcap::HostAddress(group_address.to_string())); }
+  void SocketNpcap::set_multicast_loopback_enabled(bool enabled)                     { socket_->setMulticastLoopbackEnabled(enabled); }
+  bool SocketNpcap::is_multicast_loopback_enabled() const                            { return socket_->isMulticastLoopbackEnabled(); }
+  void SocketNpcap::close()                                                          { socket_->close(); }
 
   /////////////////////////////////////////////////////////////////
   // Receiving
   /////////////////////////////////////////////////////////////////
   
-  void SocketUdpcap::async_receive_from(asio::ip::udp::endpoint& sender_endpoint
+  void SocketNpcap::async_receive_from(asio::ip::udp::endpoint& sender_endpoint
                                       , const std::function<void(const std::shared_ptr<ecaludp::OwningBuffer>&, ecaludp::Error)>& completion_handler)
   {
     receive_next_datagram_from(sender_endpoint, completion_handler);
   }
 
-  void SocketUdpcap::receive_next_datagram_from(asio::ip::udp::endpoint& sender_endpoint
+  void SocketNpcap::receive_next_datagram_from(asio::ip::udp::endpoint& sender_endpoint
                                               , const std::function<void(const std::shared_ptr<ecaludp::OwningBuffer>&, ecaludp::Error)>& completion_handler)
 
   {
@@ -134,7 +134,7 @@ namespace ecaludp
 
   }
 
-  std::shared_ptr<ecaludp::OwningBuffer> SocketUdpcap::handle_datagram(const std::shared_ptr<ecaludp::RawMemory>& buffer
+  std::shared_ptr<ecaludp::OwningBuffer> SocketNpcap::handle_datagram(const std::shared_ptr<ecaludp::RawMemory>& buffer
                                                                       , const std::shared_ptr<asio::ip::udp::endpoint>& sender_endpoint
                                                                       , ecaludp::Error& error)
   {

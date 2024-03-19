@@ -128,34 +128,43 @@ jobs:
     # Test if our binary can be linked against
     ############################################
 
-    - name: CMake integration test
+    - name: Set variables for integration test
       shell: powershell
       run: |
-            $module_path="${{github.workspace}}/thirdparty/asio-module"
-            $module_path_posix=$module_path.Replace('\', '/')
-
-            if ( '${{ matrix.library_type }}' -eq 'static' )
+            if ( '${{ matrix.npcap_enabled }}' -eq 'ON' )
             {
-              $use_udpcap = 'ON'
+              echo "integration_test_name=integration_test_npcap" >> "$Env:GITHUB_ENV"
+
+              if ( '${{ matrix.library_type }}' -eq 'static' )
+              {
+                echo "integration_test_include_udpcap=ON" >> "$Env:GITHUB_ENV"
+              }
+              else
+              {
+                echo "integration_test_include_udpcap=OFF" >> "$Env:GITHUB_ENV"
+              }
             }
             else
             {
-              $use_udpcap = 'OFF'
+              echo "integration_test_name=integration_test" >> "$Env:GITHUB_ENV"
+              echo "integration_test_include_udpcap=OFF" >> "$Env:GITHUB_ENV"
             }
 
-            cmake -B "${{github.workspace}}/samples/integration_test/_build" `
+    - name: CMake integration test
+      shell: powershell
+      run: |
+            cmake -B "${{github.workspace}}/samples/${{ env.integration_test_name }}/_build" `
                   -A ${{ matrix.build_arch }} `
                   -DCMAKE_PREFIX_PATH="${{github.workspace}}/${{env.INSTALL_PREFIX}}" `
-                  -DINTEGRATION_TEST_INCLUDE_UDPCAP=$use_udpcap `
-                  -DCMAKE_MODULE_PATH="$module_path_posix"
+                  -DINTEGRATION_TEST_INCLUDE_UDPCAP=$use_udpcap 
 
-      working-directory: ${{ github.workspace }}/samples/integration_test
+      working-directory: ${{ github.workspace }}/samples/${{ env.integration_test_name }}
       if: ${{ matrix.library_type != 'object' }}
 
     - name: Compile integration test (Release)
       shell: cmd
-      run: cmake --build ${{github.workspace}}/samples/integration_test/_build --config Release
-      working-directory: ${{ github.workspace }}/samples/integration_test
+      run: cmake --build ${{github.workspace}}/samples/${{ env.integration_test_name }}/_build --config Release
+      working-directory: ${{ github.workspace }}/samples/${{ env.integration_test_name }}
       if: ${{ matrix.library_type != 'object' }}
 
     - name: Run integration test (Release)
@@ -164,14 +173,14 @@ jobs:
            {
              $Env:Path = '${{github.workspace}}/${{env.INSTALL_PREFIX}}/bin;' + $Env:Path
            }
-           .\integration_test.exe
-      working-directory: ${{ github.workspace }}/samples/integration_test/_build/Release
+           .\${{ env.integration_test_name }}.exe
+      working-directory: ${{ github.workspace }}/samples/${{ env.integration_test_name }}/_build/Release
       if: ${{ matrix.library_type != 'object' }}
 
     - name: Compile integration test (Debug)
       shell: cmd
-      run: cmake --build ${{github.workspace}}/samples/integration_test/_build --config Debug
-      working-directory: ${{ github.workspace }}/samples/integration_test
+      run: cmake --build ${{github.workspace}}/samples/${{ env.integration_test_name }}/_build --config Debug
+      working-directory: ${{ github.workspace }}/samples/${{ env.integration_test_name }}
       if: ${{ matrix.library_type != 'object' }}
 
     - name: Run integration test (Debug)
@@ -180,6 +189,6 @@ jobs:
            {
              $Env:Path = '${{github.workspace}}/${{env.INSTALL_PREFIX}}/bin;' + $Env:Path
            }
-           .\integration_test.exe
-      working-directory: ${{ github.workspace }}/samples/integration_test/_build/Debug
+           .\${{ env.integration_test_name }}.exe
+      working-directory: ${{ github.workspace }}/samples/${{ env.integration_test_name }}/_build/Debug
       if: ${{ matrix.library_type != 'object' }}

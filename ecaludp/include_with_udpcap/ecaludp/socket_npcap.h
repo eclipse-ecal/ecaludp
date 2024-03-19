@@ -42,24 +42,24 @@ namespace ecaludp
   class recycle_shared_pool;
   class AsyncUdpcapSocket;
 
-  class SocketUdpcap
+  class SocketNpcap
   {
   /////////////////////////////////////////////////////////////////
   // Constructor
   /////////////////////////////////////////////////////////////////
   public:
-    ECALUDP_EXPORT SocketUdpcap(std::array<char, 4> magic_header_bytes);
+    ECALUDP_EXPORT SocketNpcap(std::array<char, 4> magic_header_bytes);
 
     // Destructor
-    ECALUDP_EXPORT ~SocketUdpcap();
+    ECALUDP_EXPORT ~SocketNpcap();
 
     // Disable copy constructor and assignment operator
-    SocketUdpcap(const SocketUdpcap&)             = delete;
-    SocketUdpcap& operator=(const SocketUdpcap&)  = delete;
+    SocketNpcap(const SocketNpcap&)             = delete;
+    SocketNpcap& operator=(const SocketNpcap&)  = delete;
 
     // Disable move constructor and assignment operator
-    SocketUdpcap(SocketUdpcap&&)            = delete;
-    SocketUdpcap& operator=(SocketUdpcap&&) = delete;
+    SocketNpcap(SocketNpcap&&)            = delete;
+    SocketNpcap& operator=(SocketNpcap&&) = delete;
 
   /////////////////////////////////////////////////////////////////
   // Settings
