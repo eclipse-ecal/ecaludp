@@ -209,6 +209,15 @@ install(
   FILES_MATCHING PATTERN "*.h"
 )
 
+if(ECALUDP_ENABLE_NPCAP)
+    install(
+        DIRECTORY "include_with_udpcap/ecaludp"
+        DESTINATION "include"
+        COMPONENT ecaludp_dev
+        FILES_MATCHING PATTERN "*.h"
+    )
+endif()
+
 # Install the auto-generated header with the export macros (-> dev package)
 install(
   DIRECTORY "${PROJECT_BINARY_DIR}/include/ecaludp"
