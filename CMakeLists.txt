@@ -29,6 +29,9 @@ message(STATUS "Module Path: ${CMAKE_MODULE_PATH}")
 message(STATUS "Prefix Path: ${CMAKE_PREFIX_PATH}")
 
 # CMake Options
+option(ECALUDP_ENABLE_NPCAP
+       "Enable the NPCAP based socket emulation to receive UDP data without actually opening a socket."
+       OFF)
 option(ECALUDP_BUILD_SAMPLES
        "Build project samples."
        ON)
@@ -42,6 +45,11 @@ option(ECALUDP_USE_BUILTIN_ASIO
 option(ECALUDP_USE_BUILTIN_RECYCLE
         "Use the builtin steinwurf::recycle submodule. If set to OFF, recycle must be available from somewhere else (e.g. system libs)."
         ON)
+cmake_dependent_option(ECALUDP_USE_BUILTIN_UDPCAP
+        "Use the builtin udpcap submodule. Only needed if ECALUDP_ENABLE_NPCAP is ON. If set to OFF, udpcap must be available from somewhere else (e.g. system libs). Setting this option to ON will also use the default dependencies of udpcap (npcap-sdk, pcapplusplus)."
+        ON                       # Default value if dependency is met
+        "ECALUDP_ENABLE_NPCAP"   # Dependency
+        OFF)                     # Default value if dependency is not met
 cmake_dependent_option(ECALUDP_USE_BUILTIN_GTEST
         "Use the builtin GoogleTest submodule. Only needed if ECALUDP_BUILD_TESTS is ON. If set to OFF, GoogleTest must be available from somewhere else (e.g. system libs)."
         ON                       # Default value if dependency is met
@@ -63,6 +71,11 @@ if (ECALUDP_USE_BUILTIN_RECYCLE)
     include("${CMAKE_CURRENT_LIST_DIR}/thirdparty/build-recycle.cmake")
 endif()
 
+# Use builtin recycle
+if (ECALUDP_USE_BUILTIN_UDPCAP)
+    include("${CMAKE_CURRENT_LIST_DIR}/thirdparty/build-udpcap.cmake")
+endif()
+
 # Use builtin gtest
 if (ECALUDP_USE_BUILTIN_GTEST)
     include("${CMAKE_CURRENT_LIST_DIR}/thirdparty/build-gtest.cmake")
@@ -70,23 +83,32 @@ endif()
 
 # For tests we need to make sure that all shared libraries and executables are 
 # put into the same directory. Otherwise the tests will fail on windows.
-if(ECALUDP_BUILD_TESTS AND BUILD_SHARED_LIBS AND ECALUDP_USE_BUILTIN_GTEST)
+if(ECALUDP_BUILD_TESTS AND (BUILD_SHARED_LIBS OR (ECALUDP_LIBRARY_TYPE STREQUAL "SHARED")))
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 endif()
 
 # Add main ecaludp library
 add_subdirectory(ecaludp)
 
-# Add the ecaludp dummy module
+# Add the ecaludp dummy module (for finding ecaludp::ecaludp within this build)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/ecaludp-module)
 
+# Add samples, if enabled
 if (ECALUDP_BUILD_SAMPLES)
     add_subdirectory(samples/ecaludp_sample)
+    if (ECALUDP_ENABLE_NPCAP)
+        add_subdirectory(samples/ecaludp_sample_npcap)
+    endif()
 endif()
 
+# Add Tests if enabled
 if (ECALUDP_BUILD_TESTS)
     enable_testing()
     add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/tests/ecaludp_test")
+
+    if (ECALUDP_ENABLE_NPCAP)
+        add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/tests/ecaludp_npcap_test")
+    endif()
 
     # Check if ecaludp is a static lib. We can only add the private tests for
     # static libs and object libs, as we need to have access to the private

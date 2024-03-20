@@ -16,7 +16,16 @@
 
 cmake_minimum_required(VERSION 3.13)
 
-project(ecaludp_sample)
+project(integration_test_npcap)
+
+include("${CMAKE_CURRENT_LIST_DIR}/../../thirdparty/build-asio.cmake")
+
+################################################################################
+# Add udpcap for static compiling, again
+if (INTEGRATION_TEST_INCLUDE_UDPCAP)
+  include("${CMAKE_CURRENT_LIST_DIR}/../../thirdparty/build-udpcap.cmake")
+endif()
+################################################################################
 
 find_package(Threads REQUIRED)
 find_package(ecaludp REQUIRED)
@@ -29,8 +38,8 @@ add_executable(${PROJECT_NAME} ${sources})
 
 target_link_libraries(${PROJECT_NAME}
   PRIVATE
-    ecaludp::ecaludp
-    Threads::Threads)
+    Threads::Threads
+    ecaludp::ecaludp)
 
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_14)
 

@@ -28,18 +28,24 @@ set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
 find_package(asio    REQUIRED)
 find_package(recycle REQUIRED)
 
+message(STATUS "ECALUDP_ENABLE_NPCAP: ${ECALUDP_ENABLE_NPCAP}")
+if(ECALUDP_ENABLE_NPCAP)
+    find_package(udpcap REQUIRED)
+endif()
+
 # Include GenerateExportHeader that will create export macros for us
 include(GenerateExportHeader)
 
-# Public API include directory
+###############################################
+# Normal library sources (non-npcap)
+###############################################
 set (includes
-	include/ecaludp/error.h
+    include/ecaludp/error.h
     include/ecaludp/owning_buffer.h
     include/ecaludp/raw_memory.h
     include/ecaludp/socket.h
 )
 
-# Private source files
 set(sources
     src/socket.cpp
     src/protocol/datagram_builder_v5.cpp
@@ -53,7 +59,22 @@ set(sources
     src/protocol/reassembly_v5.h
 )
 
-# Build as object library
+###############################################
+# Sources for npcap enabled build
+###############################################
+if(ECALUDP_ENABLE_NPCAP)
+    list(APPEND includes
+        include_with_udpcap/ecaludp/socket_npcap.h
+    )
+
+    list(APPEND sources
+        src/socket_npcap.cpp
+        src/async_udpcap_socket.cpp
+        src/async_udpcap_socket.h
+    )
+endif()
+
+# Build as library
 add_library (${PROJECT_NAME} ${ECALUDP_LIBRARY_TYPE}
     ${includes}
     ${sources}
@@ -79,12 +100,15 @@ target_link_libraries(${PROJECT_NAME}
         $<BUILD_INTERFACE:steinwurf::recycle>
         $<$<BOOL:${WIN32}>:ws2_32>
         $<$<BOOL:${WIN32}>:wsock32>
+        $<$<BOOL:${ECALUDP_ENABLE_NPCAP}>:udpcap::udpcap>
 )
 
 target_compile_definitions(${PROJECT_NAME}
     PRIVATE
         ASIO_STANDALONE
         _WIN32_WINNT=0x0601
+    PUBLIC
+		$<$<BOOL:${ECALUDP_ENABLE_NPCAP}>:ECALUDP_UDPCAP_ENABLED>
 )
 
 # Check if ecaludp is a static lib. We can only add the private tests for
@@ -96,6 +120,19 @@ if (ecaludp_target_type STREQUAL OBJECT_LIBRARY)
     PUBLIC
         ECALUDP_STATIC_DEFINE
     )
+endif()
+
+# If this library is NOT a shared lib (i.e. it is a static or object lib), we
+# need to re-add the DELAYLOAD wpcap.dll. Usually this is exported by udpcap,
+# but we link against that PRIVATE, so we need to re-add this specific setting,
+# that must be carried along the linkage until we hit a DLL or EXE.
+if (${ECALUDP_ENABLE_NPCAP})
+    if (NOT ecaludp_target_type STREQUAL SHARED_LIBRARY)
+        set_target_properties(${PROJECT_NAME}
+            PROPERTIES INTERFACE_LINK_OPTIONS
+            -DELAYLOAD:wpcap.dll
+        )
+    endif()
 endif()
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_14)
@@ -117,6 +154,12 @@ target_include_directories(${PROJECT_NAME}
     "src/"
 )
 
+# udpcap enabled includes
+target_include_directories(${PROJECT_NAME}
+  PUBLIC 
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include_with_udpcap>
+)
+
 set_target_properties(${PROJECT_NAME} PROPERTIES
     OUTPUT_NAME ${PROJECT_NAME}
     FOLDER ecal/udp
@@ -128,6 +171,10 @@ source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES
     ${includes}
     ${sources}
 )
+
+
+
+
 
 
 ################################################################################
@@ -161,6 +208,15 @@ install(
   COMPONENT ecaludp_dev
   FILES_MATCHING PATTERN "*.h"
 )
+
+if(ECALUDP_ENABLE_NPCAP)
+    install(
+        DIRECTORY "include_with_udpcap/ecaludp"
+        DESTINATION "include"
+        COMPONENT ecaludp_dev
+        FILES_MATCHING PATTERN "*.h"
+    )
+endif()
 
 # Install the auto-generated header with the export macros (-> dev package)
 install(

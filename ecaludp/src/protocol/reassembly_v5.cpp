@@ -80,7 +80,7 @@ namespace ecaludp
       auto* header = reinterpret_cast<ecaludp::v5::Header*>(buffer->data());
 
       const int32_t package_id = le32toh(header->id);
-      fragmented_package_key package_key{*sender_endpoint, package_id};
+      const fragmented_package_key package_key{*sender_endpoint, package_id};
 
       // Check if we already have a package with this id. If not, create one
       auto existing_package_it = fragmented_packages_.find(package_key);
@@ -119,7 +119,7 @@ namespace ecaludp
        auto* header = reinterpret_cast<ecaludp::v5::Header*>(buffer->data());
 
       const int32_t package_id = le32toh(header->id);
-      fragmented_package_key package_key{*sender_endpoint, package_id};
+      const fragmented_package_key package_key{*sender_endpoint, package_id};
 
       // Check if we already have a package with this id. If not, create one
       auto existing_package_it = fragmented_packages_.find(package_key);

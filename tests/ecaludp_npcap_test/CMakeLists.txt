@@ -14,15 +14,15 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################################
 
-cmake_minimum_required(VERSION 3.13)
-
-project(ecaludp_sample)
+project(ecaludp_npcap_test)
 
 find_package(Threads REQUIRED)
+find_package(GTest REQUIRED)
 find_package(ecaludp REQUIRED)
 
 set(sources
-  src/main.cpp
+  src/atomic_signalable.h
+  src/ecaludp_npcap_socket_test.cpp
 )
 
 add_executable(${PROJECT_NAME} ${sources})
@@ -30,10 +30,13 @@ add_executable(${PROJECT_NAME} ${sources})
 target_link_libraries(${PROJECT_NAME}
   PRIVATE
     ecaludp::ecaludp
-    Threads::Threads)
+    GTest::gtest_main)
 
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_14)
 
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES 
     ${sources}
 )
+
+include(GoogleTest)
+gtest_discover_tests(${PROJECT_NAME})

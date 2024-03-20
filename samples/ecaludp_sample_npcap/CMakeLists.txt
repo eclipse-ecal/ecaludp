@@ -16,7 +16,7 @@
 
 cmake_minimum_required(VERSION 3.13)
 
-project(ecaludp_sample)
+project(ecaludp_sample_npcap)
 
 find_package(Threads REQUIRED)
 find_package(ecaludp REQUIRED)

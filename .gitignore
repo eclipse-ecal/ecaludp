@@ -17,6 +17,7 @@ ipch
 /_build*
 /build*
 /samples/integration_test/_build*
+/samples/integration_test_npcap/_build*
 
 # Temporary Vim files
 *.swp

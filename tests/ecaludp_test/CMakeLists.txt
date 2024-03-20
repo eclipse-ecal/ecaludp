@@ -14,7 +14,7 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################################
 
-project(ecal_udp_test)
+project(ecaludp_test)
 
 find_package(Threads REQUIRED)
 find_package(GTest REQUIRED)
@@ -29,7 +29,7 @@ add_executable(${PROJECT_NAME} ${sources})
 
 target_link_libraries(${PROJECT_NAME}
   PRIVATE
-    ecaludp
+    ecaludp::ecaludp
     GTest::gtest_main)
 
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_14)

@@ -14,29 +14,28 @@
  * SPDX-License-Identifier: Apache-2.0
  ********************************************************************************/
 #include <array>
+#include <chrono>
 #include <cstddef>
 #include <cstring>
-#include <ecaludp/socket.h>
-
 #include <functional>
+#include <memory>
+#include <mutex>
+#include <recycle/shared_pool.hpp>
+#include <stdexcept>
+#include <string>
+#include <vector>
 
-#include <asio.hpp>
+#include <asio.hpp> // IWYU pragma: keep
 
 #include "ecaludp/error.h"
 #include "ecaludp/raw_memory.h"
 #include "protocol/datagram_builder_v5.h"
 #include "protocol/datagram_description.h"
 #include "protocol/header_common.h"
-
 #include "protocol/reassembly_v5.h"
 
 #include <ecaludp/owning_buffer.h>
-
-#include <memory>
-#include <mutex>
-#include <recycle/shared_pool.hpp>
-#include <string>
-#include <vector>
+#include <ecaludp/socket.h>
 
 namespace ecaludp
 {
@@ -77,14 +76,13 @@ namespace ecaludp
 
   class recycle_shared_pool : public recycle::shared_pool<ecaludp::RawMemory, buffer_pool_lock_policy_>{};
 
-
   Socket::Socket(asio::io_service& io_service, std::array<char, 4> magic_header_bytes)
-    : socket_              (io_service)
-    , datagram_buffer_pool_(new recycle_shared_pool()) // TODO: make_unique
-    , reassembly_v5_       (new ecaludp::v5::Reassembly())
-    , magic_header_bytes_  (magic_header_bytes)
+    : socket_               (io_service)
+    , datagram_buffer_pool_ (std::make_unique<ecaludp::recycle_shared_pool>())
+    , reassembly_v5_        (std::make_unique<ecaludp::v5::Reassembly>())
+    , magic_header_bytes_   (magic_header_bytes)
     , max_udp_datagram_size_(1448)
-    , max_reassembly_age_  (std::chrono::seconds(5))
+    , max_reassembly_age_   (std::chrono::seconds(5))
   {}
 
   Socket::~Socket() = default;
@@ -147,7 +145,7 @@ namespace ecaludp
                                               , const std::function<void(const std::shared_ptr<ecaludp::OwningBuffer>&, asio::error_code)>& completion_handler)
   {
     auto datagram_buffer = datagram_buffer_pool_->allocate();
-    datagram_buffer->resize(65535, false); // Max UDP datagram size. Overprovisioning is not required here, so we safe some time and memory.
+    datagram_buffer->resize(65535); // Max UDP datagram size
 
     auto buffer = datagram_buffer_pool_->allocate();
 

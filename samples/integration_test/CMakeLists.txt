@@ -18,6 +18,8 @@ cmake_minimum_required(VERSION 3.13)
 
 project(integration_test)
 
+include("${CMAKE_CURRENT_LIST_DIR}/../../thirdparty/build-asio.cmake")
+
 find_package(Threads REQUIRED)
 find_package(ecaludp REQUIRED)
 

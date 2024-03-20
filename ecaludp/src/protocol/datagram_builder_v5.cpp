@@ -19,7 +19,9 @@
 #include "header_v5.h"
 #include "portable_endian.h"
 #include "protocol/datagram_description.h"
+
 #include <algorithm>
+#include <array>
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
@@ -33,27 +35,45 @@ namespace ecaludp
 
     DatagramList create_datagram_list(const std::vector<asio::const_buffer>& buffer_sequence, size_t max_datagram_size, std::array<char, 4> magic_header_bytes)
     {
-      // TODO: Complain when the max_udp_datagram_size is too small (the header doesn't even fit)
+      // Complain when the max_udp_datagram_size is too small (the header doesn't even fit)
+      if (max_datagram_size <= sizeof(ecaludp::v5::Header))
+      {
+        throw std::invalid_argument("max_datagram_size is too small");
+      }
 
       constexpr size_t header_size = sizeof(ecaludp::v5::Header);
 
-      size_t total_size = 0;
+      // Create a new buffer_sequence that doesn't contain zero-sized buffers
+      std::vector<asio::const_buffer> buffer_sequence_without_zero_sized_buffers;
+      buffer_sequence_without_zero_sized_buffers.reserve(buffer_sequence.size());
       for (const auto& buffer : buffer_sequence)
+      {
+        if (buffer.size() > 0)
+        {
+          buffer_sequence_without_zero_sized_buffers.push_back(buffer);
+        }
+      }
+
+      // Calculate the total size of all buffers
+      size_t total_size = 0;
+      for (const auto& buffer : buffer_sequence_without_zero_sized_buffers)
       {
         total_size += buffer.size();
       }
 
       if ((total_size + header_size) <= max_datagram_size)
       {
+        // Small enough! We can send the entire payload in one datagram
         DatagramList datagram_list;
         datagram_list.reserve(1);
-        datagram_list.emplace_back(create_non_fragmented_datagram(buffer_sequence, magic_header_bytes));
+        datagram_list.emplace_back(create_non_fragmented_datagram(buffer_sequence_without_zero_sized_buffers, magic_header_bytes));
 
         return datagram_list;
       }
       else
       {
-        return create_fragmented_datagram_list(buffer_sequence, max_datagram_size, magic_header_bytes);
+        // Too big! We need to fragment the payload
+        return create_fragmented_datagram_list(buffer_sequence_without_zero_sized_buffers, max_datagram_size, magic_header_bytes);
       }
     }
 
@@ -167,7 +187,6 @@ namespace ecaludp
                 && (offset_in_current_buffer < buffer_sequence[buffer_index].size()))))
       {
         // Create a new datagram, if the last one is full, or if this is the first real datagram (besides the fragmentation info)
-        // TODO: Only add a new datagram, if there are more bytes to be sent. The next buffer MAY be empty, so we don't need to add a new datagram.
         if ((datagram_list.size() <= 1)
           || (datagram_list.back().size() >= max_udp_datagram_size))
         {
@@ -192,9 +211,6 @@ namespace ecaludp
           // Add an asio buffer for the header buffer
           datagram_list.back().asio_buffer_list_.emplace_back(datagram_list.back().header_buffer_.data(), datagram_list.back().header_buffer_.size());
         }
-
-        // TODO: Handle 0-byte-buffers. Those can be discarded directly
-        // TODO: Also test the 0-byte-buffers.
 
         // Compute how many bytes from the current buffer we can fit in the datagram
         const size_t bytes_to_fit_in_current_datagram = std::min(max_udp_datagram_size - datagram_list.back().size(), buffer_sequence[buffer_index].size() - offset_in_current_buffer);

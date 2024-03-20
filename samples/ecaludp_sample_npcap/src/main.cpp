@@ -23,12 +23,13 @@
 #include <asio.hpp>
 
 #include <ecaludp/socket.h>
-
+#include <ecaludp/socket_npcap.h>
 
 std::shared_ptr<asio::io_context> io_context_;
 
-std::shared_ptr<ecaludp::Socket>    socket_;
-std::shared_ptr<asio::steady_timer> send_timer_;
+std::shared_ptr<ecaludp::Socket>      send_socket_;
+std::shared_ptr<ecaludp::SocketNpcap> receive_socket_;
+std::shared_ptr<asio::steady_timer>   send_timer_;
 
 void send_package()
 {
@@ -36,7 +37,7 @@ void send_package()
   auto douglas_adams_buffer_2 = std::make_shared<std::string>(" ");
   auto douglas_adams_buffer_3 = std::make_shared<std::string>("This had made many people very angry and has been widely regarded as a bad move.");
 
-  socket_->async_send_to({ asio::buffer(*douglas_adams_buffer_1), asio::buffer(*douglas_adams_buffer_2), asio::buffer(*douglas_adams_buffer_3) }
+  send_socket_->async_send_to({ asio::buffer(*douglas_adams_buffer_1), asio::buffer(*douglas_adams_buffer_2), asio::buffer(*douglas_adams_buffer_3) }
                         , asio::ip::udp::endpoint(asio::ip::address_v4::loopback()
                         , 14000)
                         , [douglas_adams_buffer_1, douglas_adams_buffer_2, douglas_adams_buffer_3](asio::error_code ec)
@@ -65,12 +66,12 @@ void receive_package()
 {
   auto sender_endpoint = std::make_shared<asio::ip::udp::endpoint>();
 
-  socket_->async_receive_from(*sender_endpoint
-                              , [sender_endpoint](const std::shared_ptr<ecaludp::OwningBuffer>& buffer, asio::error_code ec)
+  receive_socket_->async_receive_from(*sender_endpoint
+                              , [sender_endpoint](const std::shared_ptr<ecaludp::OwningBuffer>& buffer, ecaludp::Error& error)
                                 {
-                                  if (ec)
+                                  if (error)
                                   {
-                                    std::cout << "Error receiving: " << ec.message() << std::endl;
+                                    std::cout << "Error receiving: " << error.ToString() << std::endl;
                                     return;
                                   }
 
@@ -88,11 +89,12 @@ int main(int argc, char** argv)
 
   io_context_ = std::make_shared<asio::io_context>();
 
-  socket_ = std::make_shared<ecaludp::Socket>(*io_context_, std::array<char, 4>{'E', 'C', 'A', 'L'});
+  send_socket_    = std::make_shared<ecaludp::Socket>     (*io_context_, std::array<char, 4>{'E', 'C', 'A', 'L'});
+  receive_socket_ = std::make_shared<ecaludp::SocketNpcap>(std::array<char, 4>{'E', 'C', 'A', 'L'});
 
   {
     asio::error_code ec;
-    socket_->open(asio::ip::udp::v4(), ec);
+    send_socket_->open(asio::ip::udp::v4(), ec);
 
     if (ec)
     {
@@ -102,12 +104,11 @@ int main(int argc, char** argv)
   }
 
   {
-    asio::error_code ec;
-    socket_->bind(asio::ip::udp::endpoint(asio::ip::address_v4::loopback(), 14000), ec);
+    bool bind_success = receive_socket_->bind(asio::ip::udp::endpoint(asio::ip::address_v4::loopback(), 14000));
 
-    if (ec)
+    if (!bind_success)
     {
-      std::cout << "Error binding socket: " << ec.message() << std::endl;
+      std::cout << "Error binding socket" << std::endl;
       return -1;
     }
   }

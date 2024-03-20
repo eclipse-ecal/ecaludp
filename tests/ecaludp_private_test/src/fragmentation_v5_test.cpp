@@ -17,31 +17,23 @@
 #include <gtest/gtest.h>
 
 #include <chrono>
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <memory>
+#include <string>
 #include <thread>
 
 #include <asio.hpp>
 
+#include <ecaludp/error.h>
+#include <ecaludp/raw_memory.h>
+
 #include <protocol/datagram_builder_v5.h>
-#include <protocol/reassembly_v5.h>
+#include <protocol/datagram_description.h>
 #include <protocol/header_v5.h>
-
 #include <protocol/portable_endian.h>
-
-// Define your test fixture
-class FragmentationV5Test : public ::testing::Test {
-protected:
-  // Set up the test fixture
-  void SetUp() override
-  {
-    // Code to set up the test fixture
-  }
-
-  // Tear down the test fixture
-  void TearDown() override
-  {
-    // Code to tear down the test fixture
-  }
-};
+#include <protocol/reassembly_v5.h>
 
 std::shared_ptr<ecaludp::RawMemory> to_binary_buffer(const ecaludp::DatagramDescription& datagram_description)
 {
@@ -60,7 +52,7 @@ std::shared_ptr<ecaludp::RawMemory> to_binary_buffer(const ecaludp::DatagramDesc
 }
 
 // Check "Fragmentation" and "Defragmentation" of a single normal message that is smaller than the MTU, i.e. no fragmentation is needed
-TEST_F(FragmentationV5Test, NonFragmentedMessage)
+TEST(FragmentationV5Test, NonFragmentedMessage)
 {
   // Create a Hello World string
   std::string hello_world = "Hello World!";
@@ -114,7 +106,7 @@ TEST_F(FragmentationV5Test, NonFragmentedMessage)
 }
 
 // Check the fragmentation and defragmentation of a single message that is larger than the MTU
-TEST_F(FragmentationV5Test, FragmentedMessage)
+TEST(FragmentationV5Test, FragmentedMessage)
 {
   // Create a longer string
   auto message_to_send = std::string("In the beginning the Universe was created. This had made many people very angry and has been widely regarded as a bad move.");
@@ -212,7 +204,7 @@ TEST_F(FragmentationV5Test, FragmentedMessage)
 }
 
 // Check the defragmentation of a long message that is larger than the MTU and arrives out of order
-TEST_F(FragmentationV5Test, OutOfOrderFragments)
+TEST(FragmentationV5Test, OutOfOrderFragments)
 {
   // Create a longer string
   auto message_to_send = std::string("In the beginning the Universe was created. This had made many people very angry and has been widely regarded as a bad move.");
@@ -285,7 +277,7 @@ TEST_F(FragmentationV5Test, OutOfOrderFragments)
 }
 
 // Check the handling of a 1-fragment-message (i.e. a message that is small enough to fit into a single datagram, but is still fragmented)
-TEST_F(FragmentationV5Test, SingleFragmentFragmentation)
+TEST(FragmentationV5Test, SingleFragmentFragmentation)
 {
   // Create a Hello World string
   std::string hello_world = "Hello World!";
@@ -362,7 +354,7 @@ TEST_F(FragmentationV5Test, SingleFragmentFragmentation)
 }
 
 // Check "Fragmentation" and "Defragmentation" of a 0-byte message
-TEST_F(FragmentationV5Test, ZeroByteMessage)
+TEST(FragmentationV5Test, ZeroByteMessage)
 {
   // Create a 0-byte string
   std::string zero_byte_string;
@@ -413,7 +405,7 @@ TEST_F(FragmentationV5Test, ZeroByteMessage)
 }
 
 // Check Fragmentation and defragmentation of a muli-buffer-message
-TEST_F(FragmentationV5Test, MultiBufferFragmentation)
+TEST(FragmentationV5Test, MultiBufferFragmentation)
 {
   auto message_to_send_1 = std::make_shared<std::string>("In the beginning the Universe was created.");
   auto message_to_send_2 = std::make_shared<std::string>(" ");
@@ -504,7 +496,70 @@ TEST_F(FragmentationV5Test, MultiBufferFragmentation)
   }
 }
 
-TEST_F(FragmentationV5Test, Cleanup)
+// Test if a tailing zero-buffer will create a new fragment (it shouldn't)
+TEST(FragmentationV5Test, MultiBufferWithTailingZeroBuffer)
+{
+  auto message_to_send_1 = std::make_shared<std::string>("Hello World!");
+  auto message_to_send_2 = std::make_shared<std::string>("");
+  auto message_to_send_3 = std::make_shared<std::string>("");
+
+  // Create an asio buffer from the string
+  asio::const_buffer message_to_send_buffer_1 = asio::buffer(*message_to_send_1);
+  asio::const_buffer message_to_send_buffer_2 = asio::buffer(*message_to_send_2);
+  asio::const_buffer message_to_send_buffer_3 = asio::buffer(*message_to_send_3);
+
+  // Compute the UDP Datagram size. The goal is to fill exactly 2 datagrams with the "Hello World" message
+  ASSERT_EQ(0, message_to_send_1->size() % 2); // Quickly check that the message has a size dividable by 2
+  size_t max_datagram_size = sizeof(ecaludp::v5::Header) + (message_to_send_1->size() / 2);
+
+  // Let the datagram builder create fragments for the buffer with the computed max datagram size
+  auto datagram_list = ecaludp::v5::create_datagram_list({message_to_send_buffer_1, message_to_send_buffer_2}, max_datagram_size, {'E', 'C', 'A', 'L'});
+
+  // The datagram list must have exactly 3 entries: 1 fragment info and 2 fragments. The empty message must have disappeared
+  ASSERT_EQ(datagram_list.size(), 3);
+
+  // The size of the datagram list is the size of the buffer plus the size of the header
+  ASSERT_EQ(datagram_list[0].size(), sizeof(ecaludp::v5::Header)); // This is the fragment info
+  ASSERT_EQ(datagram_list[1].size(), sizeof(ecaludp::v5::Header) + message_to_send_1->size() / 2); // This is the first fragment
+  ASSERT_EQ(datagram_list[2].size(), sizeof(ecaludp::v5::Header) + message_to_send_1->size() / 2); // This is the second fragment
+
+  // Copy the datagram list to a couple of binary buffers
+  auto binary_buffer_1 = to_binary_buffer(datagram_list[0]);
+  auto binary_buffer_2 = to_binary_buffer(datagram_list[1]);
+  auto binary_buffer_3 = to_binary_buffer(datagram_list[2]);
+
+  // Create the reassembly
+  ecaludp::v5::Reassembly reassembly;
+
+  // Create a fake sender endpoint as shared_ptr
+  auto sender_endpoint = std::make_shared<asio::ip::udp::endpoint>();
+  sender_endpoint->address(asio::ip::address::from_string("127.0.0.1"));
+  sender_endpoint->port(1234);
+
+  // Reassemble all datagrams
+  {
+    ecaludp::Error error (ecaludp::Error::GENERIC_ERROR);
+
+    reassembly.handle_datagram(binary_buffer_1, sender_endpoint, error);
+    reassembly.handle_datagram(binary_buffer_2, sender_endpoint, error);
+    auto reassembled_message = reassembly.handle_datagram(binary_buffer_3, sender_endpoint, error);
+
+    // The reassembly must have succeeded
+    ASSERT_EQ(error, ecaludp::Error::OK);
+
+    // The message must not be nullptr
+    ASSERT_NE(reassembled_message, nullptr);
+
+    // The message must have the same size as the original buffer
+    ASSERT_EQ(reassembled_message->size(), message_to_send_1->size());
+
+    // The message must contain the same data as the original buffer
+    ASSERT_EQ(std::memcmp(reassembled_message->data(), message_to_send_1->data(), message_to_send_1->size()), 0);
+  }
+}
+
+// Test whether "too old" packages are removed from the reassembly
+TEST(FragmentationV5Test, Cleanup)
 {
   // Create 2 messages that are the same size
   auto message_1 = std::make_shared<std::string>("In the beginning the Universe was created.");
@@ -617,7 +672,7 @@ TEST_F(FragmentationV5Test, Cleanup)
   }
 }
 
-TEST_F(FragmentationV5Test, FaultyFragmentedMessages)
+TEST(FragmentationV5Test, FaultyFragmentedMessages)
 {
   // Create a longer string
   auto message_to_send = std::string("In the beginning the Universe was created. This had made many people very angry and has been widely regarded as a bad move.");
@@ -763,12 +818,4 @@ TEST_F(FragmentationV5Test, FaultyFragmentedMessages)
   }
 }
 
-// TODO: Test adding faulty datagrams and duplicated datagrams to the reassembly
 // TODO: Test adding messages from more than 1 sender to the reassembly
-
-// Entry point for running the tests
-int main(int argc, char** argv)
-{
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}
