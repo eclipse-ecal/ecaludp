@@ -102,8 +102,8 @@ namespace ecaludp
 
       header_ptr->version = 5;
 
-      header_ptr->type     = static_cast<ecaludp::v5::message_type_uint32t>(
-                                htole32(static_cast<uint32_t>(ecaludp::v5::message_type_uint32t::msg_type_non_fragmented_message)));
+      header_ptr->type     = static_cast<ecaludp::v5::datagram_type_uint32t>(
+                                htole32(static_cast<uint32_t>(ecaludp::v5::datagram_type_uint32t::datagram_type_non_fragmented_message)));
       header_ptr->id       = htole32(int32_t(-1));   // -1 => not fragmented
       header_ptr->num      = htole32(uint32_t(1));    // 1 => only 1 fragment
       header_ptr->len      = htole32(static_cast<uint32_t>(total_size)); // denotes the length of the payload of this message only
@@ -168,8 +168,8 @@ namespace ecaludp
 
         fragment_info_header_ptr->version = 5;
 
-        fragment_info_header_ptr->type     = static_cast<ecaludp::v5::message_type_uint32t>(
-                                                htole32(static_cast<int32_t>(ecaludp::v5::message_type_uint32t::msg_type_fragmented_message_info)));
+        fragment_info_header_ptr->type     = static_cast<ecaludp::v5::datagram_type_uint32t>(
+                                                htole32(static_cast<int32_t>(ecaludp::v5::datagram_type_uint32t::datagram_type_fragmented_message_info)));
         fragment_info_header_ptr->id       = htole32(message_id);
         fragment_info_header_ptr->num      = htole32(needed_fragment_count);
         fragment_info_header_ptr->len      = htole32(total_size); // denotes the length of the entire payload
@@ -202,8 +202,8 @@ namespace ecaludp
           
           header_ptr->version = 5;
 
-          header_ptr->type     = static_cast<ecaludp::v5::message_type_uint32t>(
-                                    htole32(static_cast<uint32_t>(ecaludp::v5::message_type_uint32t::msg_type_fragment)));
+          header_ptr->type     = static_cast<ecaludp::v5::datagram_type_uint32t>(
+                                    htole32(static_cast<uint32_t>(ecaludp::v5::datagram_type_uint32t::datagram_type_fragment)));
           header_ptr->id       = htole32(message_id);
           header_ptr->num      = htole32(static_cast<uint32_t>(datagram_list.size() - 2)); // -1, because the first datagram is the fragmentation info
           header_ptr->len      = htole32(static_cast<uint32_t>(0));                        // denotes the length of the entire payload

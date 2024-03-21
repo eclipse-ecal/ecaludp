@@ -75,7 +75,7 @@ TEST(FragmentationV5Test, NonFragmentedMessage)
   // Check the header
   auto* header = reinterpret_cast<ecaludp::v5::Header*>(binary_buffer->data());
   ASSERT_EQ(header->version, 5);
-  ASSERT_EQ(le32toh(static_cast<uint32_t>(header->type)), 3u /* = ecaludp::v5::message_type_uint32t::msg_type_non_fragmented_message */);
+  ASSERT_EQ(le32toh(static_cast<uint32_t>(header->type)), 3u /* = ecaludp::v5::datagram_type_uint32t::datagram_type_non_fragmented_message */);
   ASSERT_EQ(le32toh(header->id), -1);
   ASSERT_EQ(le32toh(header->num), 1);
   ASSERT_EQ(le32toh(header->len), hello_world.size());
@@ -135,7 +135,7 @@ TEST(FragmentationV5Test, FragmentedMessage)
   auto* header_1 = reinterpret_cast<ecaludp::v5::Header*>(binary_buffer_1->data());
   auto common_id = le32toh(header_1->id);
   ASSERT_EQ(header_1->version, 5);
-  ASSERT_EQ(le32toh(static_cast<uint32_t>(header_1->type)), 1u /* = ecaludp::v5::message_type_uint32t::msg_type_fragment_info */);
+  ASSERT_EQ(le32toh(static_cast<uint32_t>(header_1->type)), 1u /* = ecaludp::v5::datagram_type_uint32t::msg_type_fragment_info */);
   ASSERT_EQ(le32toh(header_1->num), 2);
   ASSERT_EQ(le32toh(header_1->id), common_id);
   ASSERT_EQ(le32toh(header_1->len), message_size);
@@ -143,7 +143,7 @@ TEST(FragmentationV5Test, FragmentedMessage)
   // Check the header of the first fragment
   auto* header_2 = reinterpret_cast<ecaludp::v5::Header*>(binary_buffer_2->data());
   ASSERT_EQ(header_2->version, 5);
-  ASSERT_EQ(le32toh(static_cast<uint32_t>(header_2->type)), 2u /* = ecaludp::v5::message_type_uint32t::msg_type_fragment */);
+  ASSERT_EQ(le32toh(static_cast<uint32_t>(header_2->type)), 2u /* = ecaludp::v5::datagram_type_uint32t::datagram_type_fragment */);
   ASSERT_EQ(le32toh(header_2->id), common_id);
   ASSERT_EQ(le32toh(header_2->num), 0);
   ASSERT_EQ(le32toh(header_2->len), 100 - sizeof(ecaludp::v5::Header));
@@ -151,7 +151,7 @@ TEST(FragmentationV5Test, FragmentedMessage)
   // Check the header of the last fragment
   auto* header_3 = reinterpret_cast<ecaludp::v5::Header*>(binary_buffer_3->data());
   ASSERT_EQ(header_3->version, 5);
-  ASSERT_EQ(le32toh(static_cast<uint32_t>(header_3->type)), 2u /* = ecaludp::v5::message_type_uint32t::msg_type_fragment */);
+  ASSERT_EQ(le32toh(static_cast<uint32_t>(header_3->type)), 2u /* = ecaludp::v5::datagram_type_uint32t::datagram_type_fragment */);
   ASSERT_EQ(le32toh(header_3->id),  common_id);
   ASSERT_EQ(le32toh(header_3->num), 1);
   ASSERT_EQ(le32toh(header_3->len), message_size - (100 - sizeof(ecaludp::v5::Header)));
@@ -303,7 +303,7 @@ TEST(FragmentationV5Test, SingleFragmentFragmentation)
   auto* header_1 = reinterpret_cast<ecaludp::v5::Header*>(binary_buffer_1->data());
   auto common_id = le32toh(header_1->id);
   ASSERT_EQ(header_1->version, 5);
-  ASSERT_EQ(le32toh(static_cast<uint32_t>(header_1->type)), 1u /* = ecaludp::v5::message_type_uint32t::msg_type_fragment_info */);
+  ASSERT_EQ(le32toh(static_cast<uint32_t>(header_1->type)), 1u /* = ecaludp::v5::datagram_type_uint32t::msg_type_fragment_info */);
   ASSERT_EQ(le32toh(header_1->num), 1);
   ASSERT_EQ(le32toh(header_1->id), common_id);
   ASSERT_EQ(le32toh(header_1->len), hello_world.size());
@@ -311,7 +311,7 @@ TEST(FragmentationV5Test, SingleFragmentFragmentation)
   // Check the header of the first fragment
   auto* header_2 = reinterpret_cast<ecaludp::v5::Header*>(binary_buffer_2->data());
   ASSERT_EQ(header_2->version, 5);
-  ASSERT_EQ(le32toh(static_cast<uint32_t>(header_2->type)), 2u /* = ecaludp::v5::message_type_uint32t::msg_type_fragment */);
+  ASSERT_EQ(le32toh(static_cast<uint32_t>(header_2->type)), 2u /* = ecaludp::v5::datagram_type_uint32t::datagram_type_fragment */);
   ASSERT_EQ(le32toh(header_2->id), common_id);
   ASSERT_EQ(le32toh(header_2->num), 0);
   ASSERT_EQ(le32toh(header_2->len), hello_world.size());
@@ -377,7 +377,7 @@ TEST(FragmentationV5Test, ZeroByteMessage)
   // Check the header
   auto* header = reinterpret_cast<ecaludp::v5::Header*>(binary_buffer->data());
   ASSERT_EQ(header->version, 5);
-  ASSERT_EQ(le32toh(static_cast<uint32_t>(header->type)), 3u /* = ecaludp::v5::message_type_uint32t::msg_type_non_fragmented_message */);
+  ASSERT_EQ(le32toh(static_cast<uint32_t>(header->type)), 3u /* = ecaludp::v5::datagram_type_uint32t::datagram_type_non_fragmented_message */);
   ASSERT_EQ(le32toh(header->id), -1);
   ASSERT_EQ(le32toh(header->num), 1);
   ASSERT_EQ(le32toh(header->len), 0);
@@ -749,7 +749,7 @@ TEST(FragmentationV5Test, FaultyFragmentedMessages)
   {
     auto faulty_binary_buffer_2 = std::make_shared<ecaludp::RawMemory>(*binary_buffer_2);
     auto* header = reinterpret_cast<ecaludp::v5::Header*>(faulty_binary_buffer_2->data());
-    header->type = static_cast<ecaludp::v5::message_type_uint32t>(1000);
+    header->type = static_cast<ecaludp::v5::datagram_type_uint32t>(1000);
 
     ecaludp::Error error = ecaludp::Error::ErrorCode::GENERIC_ERROR;
     auto message = reassembly.handle_datagram(faulty_binary_buffer_2, sender_endpoint, error);
