@@ -53,18 +53,18 @@ namespace ecaludp
       const auto* header = reinterpret_cast<ecaludp::v5::Header*>(buffer->data());
 
       // Each message type must be handled differently
-      if (static_cast<ecaludp::v5::message_type_uint32t>(le32toh(static_cast<uint32_t>(header->type)))
-                 == ecaludp::v5::message_type_uint32t::msg_type_fragmented_message_info)
+      if (static_cast<ecaludp::v5::datagram_type_uint32t>(le32toh(static_cast<uint32_t>(header->type)))
+                 == ecaludp::v5::datagram_type_uint32t::datagram_type_fragmented_message_info)
       {
         return handle_datagram_fragmented_message_info(buffer, sender_endpoint, error);
       }
-      else if (static_cast<ecaludp::v5::message_type_uint32t>(le32toh(static_cast<uint32_t>(header->type)))
-                 == ecaludp::v5::message_type_uint32t::msg_type_fragment)
+      else if (static_cast<ecaludp::v5::datagram_type_uint32t>(le32toh(static_cast<uint32_t>(header->type)))
+                 == ecaludp::v5::datagram_type_uint32t::datagram_type_fragment)
       {
         return handle_datagram_fragment(buffer, sender_endpoint, error);
       }
-      else if (static_cast<ecaludp::v5::message_type_uint32t>(le32toh(static_cast<uint32_t>(header->type)))
-                 == ecaludp::v5::message_type_uint32t::msg_type_non_fragmented_message)
+      else if (static_cast<ecaludp::v5::datagram_type_uint32t>(le32toh(static_cast<uint32_t>(header->type)))
+                 == ecaludp::v5::datagram_type_uint32t::datagram_type_non_fragmented_message)
       {
         return handle_datagram_non_fragmented_message(buffer, error);
       }
