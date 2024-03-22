@@ -26,6 +26,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <mutex>
+#include <stdexcept>
 #include <vector>
 
 namespace ecaludp

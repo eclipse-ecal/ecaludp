@@ -16,6 +16,7 @@
 #pragma once
 
 #include "datagram_description.h"
+#include <array>
 #include <cstddef>
 #include <cstdint>
 #include <vector>

@@ -19,17 +19,17 @@
 #include <cstdint>
 #include <map>
 #include <memory>
-
-#include <asio.hpp>
-
 #include <mutex>
+#include <utility>
+#include <vector>
+
+#include <asio.hpp> // IWYU pragma: keep
+
 #include <recycle/shared_pool.hpp>
 
 #include <ecaludp/error.h>
 #include <ecaludp/owning_buffer.h>
 #include <ecaludp/raw_memory.h>
-#include <utility>
-#include <vector>
 
 namespace ecaludp
 {

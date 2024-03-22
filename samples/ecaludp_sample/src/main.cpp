@@ -20,7 +20,7 @@
 #include <memory>
 #include <string>
 
-#include <asio.hpp>
+#include <asio.hpp> // IWYU pragma: keep
 
 #include <ecaludp/socket.h>
 
