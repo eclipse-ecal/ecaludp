@@ -18,7 +18,7 @@
 #include <cstddef>
 #include <vector>
 
-#include <asio.hpp>
+#include <asio.hpp> // IWYU pragma: keep
 
 namespace ecaludp {
 class DatagramDescription

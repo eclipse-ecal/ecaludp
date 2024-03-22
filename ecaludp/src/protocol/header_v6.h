@@ -25,7 +25,7 @@ namespace ecaludp
     #pragma pack(push, 1)
     struct Header
     {
-      unsigned char magic[4];
+      unsigned char magic[4] = {'\0', '\0', '\0', '\0'};
 
       uint8_t version     = 0;
       uint8_t header_size = 0;

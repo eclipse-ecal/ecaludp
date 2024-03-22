@@ -22,7 +22,7 @@
 #include <memory>
 #include <vector>
 
-#include <asio.hpp>
+#include <asio.hpp> // IWYU pragma: keep
 
 // IWYU pragma: begin_exports
 #include <ecaludp/ecaludp_export.h>
