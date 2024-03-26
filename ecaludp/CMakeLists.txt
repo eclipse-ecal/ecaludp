@@ -93,7 +93,7 @@ add_library (ecaludp::ecaludp ALIAS ${PROJECT_NAME})
 
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
-        asio::asio
+        $<BUILD_INTERFACE:asio::asio>
     PRIVATE
         # Link header-only libs (recycle) as described in this workaround:
         # https://gitlab.kitware.com/cmake/cmake/-/issues/15415#note_633938
