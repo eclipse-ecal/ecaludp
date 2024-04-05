@@ -13,28 +13,22 @@
  * 
  * SPDX-License-Identifier: Apache-2.0
  ********************************************************************************/
+#pragma once
 
-#include <iostream>
-
-#include <asio.hpp>
-#include <ecaludp/socket_npcap.h>
 #include <ecaludp/npcap_helpers.h>
 
-#include <thread>
+#include <string>
 
-int main()
+#include <udpcap/npcap_helpers.h>
+
+namespace ecaludp
 {
-  // Initialize npcap explicitely
-  ecaludp::npcap::initialize();
+  namespace npcap
+  {
+    bool initialize() { return Udpcap::Initialize(); }
+    
+    bool is_initialized() { return Udpcap::IsInitialized(); }
 
-  // Create a socket
-  ecaludp::SocketNpcap socket({'E', 'C', 'A', 'L'});
-
-  // Bind the socket
-  bool success = socket.bind(asio::ip::udp::endpoint(asio::ip::address_v4::loopback(), 14000));
-  
-  // Print whether binding was successfull. If the npcap driver is not installed, this will fail, but not crash.
-  std::cout << "Bind success: " << (success ? "true" : "false") << std::endl;
-  
-  return 0;
+    std::string get_human_readable_error_text() { return Udpcap::GetHumanReadibleErrorText(); }
+  }
 }
