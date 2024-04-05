@@ -133,6 +133,11 @@ namespace ecaludp
                                     , const asio::ip::udp::endpoint& destination
                                     , const std::function<void(asio::error_code)>& completion_handler);
 
+    ECALUDP_EXPORT std::size_t sync_send_to(const std::vector<asio::const_buffer>& buffer_sequence
+                                          , const asio::ip::udp::endpoint& destination
+                                          , asio::socket_base::message_flags flags
+                                          , asio::error_code& ec);
+
     ECALUDP_EXPORT void set_max_udp_datagram_size(std::size_t max_udp_datagram_size);
     ECALUDP_EXPORT std::size_t get_max_udp_datagram_size() const;
 
