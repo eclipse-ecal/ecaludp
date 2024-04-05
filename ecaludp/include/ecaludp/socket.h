@@ -100,6 +100,15 @@ namespace ecaludp
     asio::ip::udp::endpoint local_endpoint()                     const                           { return socket_.local_endpoint(); }
     asio::ip::udp::endpoint local_endpoint(asio::error_code& ec) const                           { return socket_.local_endpoint(ec); }
 
+    asio::ip::udp::socket::lowest_layer_type& lowest_layer()                                     { return socket_.lowest_layer(); }
+    const asio::ip::udp::socket::lowest_layer_type& lowest_layer() const                         { return socket_.lowest_layer(); }
+
+    asio::ip::udp::socket::native_handle_type native_handle()                                    { return socket_.native_handle(); }
+
+    bool native_non_blocking() const                                                             { return socket_.native_non_blocking(); }
+    void native_non_blocking(bool mode)                                                          { socket_.native_non_blocking(mode); }
+    void native_non_blocking(bool mode, asio::error_code& ec)                                    { socket_.native_non_blocking(mode, ec); }
+
     void open(const asio::ip::udp& protocol)                                                     { socket_.open(protocol); }
     asio::error_code open(const asio::ip::udp& protocol, asio::error_code& ec)                   { return socket_.open(protocol, ec); }
 
@@ -114,6 +123,7 @@ namespace ecaludp
 
     void shutdown(asio::socket_base::shutdown_type what)                                         { socket_.shutdown(what); }
     asio::error_code shutdown(asio::socket_base::shutdown_type what, asio::error_code& ec)       { return socket_.shutdown(what, ec); }
+
 
   /////////////////////////////////////////////////////////////////
   // Sending
