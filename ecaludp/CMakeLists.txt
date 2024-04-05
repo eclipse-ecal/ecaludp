@@ -64,13 +64,15 @@ set(sources
 ###############################################
 if(ECALUDP_ENABLE_NPCAP)
     list(APPEND includes
+        include_with_udpcap/ecaludp/npcap_helpers.h
         include_with_udpcap/ecaludp/socket_npcap.h
     )
 
     list(APPEND sources
-        src/socket_npcap.cpp
         src/async_udpcap_socket.cpp
         src/async_udpcap_socket.h
+        src/npcap_helpers.cpp
+        src/socket_npcap.cpp
     )
 endif()
 
