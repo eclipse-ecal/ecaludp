@@ -133,7 +133,7 @@ namespace ecaludp
                                     , const asio::ip::udp::endpoint& destination
                                     , const std::function<void(asio::error_code)>& completion_handler);
 
-    ECALUDP_EXPORT std::size_t sync_send_to(const std::vector<asio::const_buffer>& buffer_sequence
+    ECALUDP_EXPORT std::size_t send_to(const std::vector<asio::const_buffer>& buffer_sequence
                                           , const asio::ip::udp::endpoint& destination
                                           , asio::socket_base::message_flags flags
                                           , asio::error_code& ec);

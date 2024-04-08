@@ -67,7 +67,7 @@ namespace ecaludp
                               });
     }
 
-    std::size_t sync_send_datagram_list_to(asio::ip::udp::socket& socket
+    std::size_t send_datagram_list_to(asio::ip::udp::socket& socket
       , const DatagramList& datagram_list
       , const asio::ip::udp::endpoint& destination
       , asio::socket_base::message_flags flags
@@ -80,6 +80,24 @@ namespace ecaludp
         if (ec) return 0;
       }
       return sent;
+    }
+
+    std::shared_ptr<DatagramList> get_datagram_list(const std::vector<asio::const_buffer>& buffer_sequence, size_t max_datagram_size, std::array<char, 4> magic_header_bytes)
+    {
+      constexpr int protocol_version = 5;  //TODO: make this configurable
+
+      auto datagram_list = std::make_shared<DatagramList>();
+
+      if (protocol_version == 5)
+      {
+        *datagram_list = ecaludp::v5::create_datagram_list(buffer_sequence, max_datagram_size, magic_header_bytes);
+      }
+      else
+      {
+        throw std::runtime_error("Protocol version not supported");
+      }
+
+      return datagram_list;
     }
   }
 
@@ -106,18 +124,7 @@ namespace ecaludp
                                 , const asio::ip::udp::endpoint& destination
                                 , const std::function<void(asio::error_code)>& completion_handler)
   {
-    constexpr int protocol_version  = 5;  //TODO: make this configurable
-
-    auto datagram_list = std::make_shared<DatagramList>();
-
-    if (protocol_version == 5)
-    {
-      *datagram_list = ecaludp::v5::create_datagram_list(buffer_sequence, max_udp_datagram_size_, magic_header_bytes_);
-    }
-    else
-    {
-      throw std::runtime_error("Protocol version not supported");
-    }
+    auto datagram_list = get_datagram_list(buffer_sequence, max_udp_datagram_size_, magic_header_bytes_);
 
     async_send_datagram_list_to(socket_
                               , *datagram_list
@@ -129,26 +136,15 @@ namespace ecaludp
                                 });
   }
 
-  std::size_t Socket::sync_send_to(const std::vector<asio::const_buffer>& buffer_sequence
+  std::size_t Socket::send_to(const std::vector<asio::const_buffer>& buffer_sequence
     , const asio::ip::udp::endpoint& destination
     , asio::socket_base::message_flags flags
     , asio::error_code& ec)
 
   {
-    constexpr int protocol_version = 5;  //TODO: make this configurable
+    auto datagram_list = get_datagram_list(buffer_sequence, max_udp_datagram_size_, magic_header_bytes_);
 
-    auto datagram_list = std::make_shared<DatagramList>();
-
-    if (protocol_version == 5)
-    {
-      *datagram_list = ecaludp::v5::create_datagram_list(buffer_sequence, max_udp_datagram_size_, magic_header_bytes_);
-    }
-    else
-    {
-      throw std::runtime_error("Protocol version not supported");
-    }
-
-    return sync_send_datagram_list_to(socket_, *datagram_list, destination, flags, ec);
+    return send_datagram_list_to(socket_, *datagram_list, destination, flags, ec);
   }
 
   void Socket::set_max_udp_datagram_size(std::size_t max_udp_datagram_size)
