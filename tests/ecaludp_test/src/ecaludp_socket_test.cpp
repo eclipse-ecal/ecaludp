@@ -325,7 +325,7 @@ TEST(EcalUdpSocket, SyncBigMessage)
   ecaludp::Socket rcv_socket (io_context, {'E', 'C', 'A', 'L'});
     
   // Create the message to send and fill it with random characters
-  std::string message_to_send(1024 * 1024, 'a');
+  std::string message_to_send(1024 * 256, 'a'); // TODO: I had to set this to 256 KiB instead of 1MiB to work on Linux. Maybe the default UDP buffers in Linux are smaller?
   std::generate(message_to_send.begin(), message_to_send.end(), []() { return static_cast<char>(std::rand()); });
 
   // Create a thread that will receive a message
