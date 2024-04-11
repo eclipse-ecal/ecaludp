@@ -29,6 +29,8 @@
 #include <string>
 #include <thread>
 
+// TODO: Add a test for cancelling an async operation
+
 // Send and Receive a small Hello World message using the async API
 TEST(EcalUdpSocket, AsyncHelloWorldMessage)
 {
@@ -120,13 +122,19 @@ TEST(EcalUdpSocket, AsyncBigMessage)
     ASSERT_EQ(ec, asio::error_code());
   }
 
-  // Set a big receive buffer size, so we will not lose fragments
+  // Set a big send buffer size, so we will not lose outgoing fragments
+  {
+    asio::error_code ec;
+    socket.set_option(asio::socket_base::send_buffer_size(1024 * 1024 * 5), ec);
+    ASSERT_FALSE(ec);
+  }
+
+  // Set a big receive buffer size, so we will not lose incoming fragments
   {
     asio::error_code ec;
     socket.set_option(asio::socket_base::receive_buffer_size(1024 * 1024 * 5), ec);
     ASSERT_FALSE(ec);
   }
-      
 
   auto work = std::make_unique<asio::io_context::work>(io_context);
   std::thread io_thread([&io_context]() { io_context.run(); });
@@ -337,7 +345,7 @@ TEST(EcalUdpSocket, SyncBigMessage)
                               ASSERT_FALSE(ec);
                             }
 
-                            // Set a big receive buffer size, so we will not lose fragments
+                            // Set a big receive buffer size, so we will not lose incoming fragments
                             {
                               asio::error_code ec;
                               rcv_socket.set_option(asio::socket_base::receive_buffer_size(1024 * 1024 * 5), ec);
@@ -365,6 +373,13 @@ TEST(EcalUdpSocket, SyncBigMessage)
   // Create destination endpoint
   const asio::ip::udp::endpoint destination(asio::ip::address_v4::loopback(), 14000);
   send_socket.open(destination.protocol());
+
+  // Set a big send buffer size, so we will not lose outgoing fragments
+  {
+    asio::error_code ec;
+    send_socket.set_option(asio::socket_base::send_buffer_size(1024 * 1024 * 5), ec);
+    ASSERT_FALSE(ec);
+  }
 
   // Send a message
   {

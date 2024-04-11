@@ -39,6 +39,8 @@
 
 #include <recycle/shared_pool.hpp>
 
+// TODO: Add sync operations
+
 namespace ecaludp
 {
   
