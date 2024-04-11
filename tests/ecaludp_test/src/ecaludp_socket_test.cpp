@@ -120,6 +120,14 @@ TEST(EcalUdpSocket, AsyncBigMessage)
     ASSERT_EQ(ec, asio::error_code());
   }
 
+  // Set a big receive buffer size, so we will not lose fragments
+  {
+    asio::error_code ec;
+    socket.set_option(asio::socket_base::receive_buffer_size(1024 * 1024 * 5), ec);
+    ASSERT_FALSE(ec);
+  }
+      
+
   auto work = std::make_unique<asio::io_context::work>(io_context);
   std::thread io_thread([&io_context]() { io_context.run(); });
 
@@ -202,7 +210,7 @@ TEST(EcalUdpSocket, CancelSyncReceive)
                          });
 
   // Wait 10 milliseconds to make sure that the receiver is ready
-  std::this_thread::sleep_for(std::chrono::milliseconds(500));
+  std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
   // Cancel the receive
   {
@@ -220,7 +228,6 @@ TEST(EcalUdpSocket, CancelSyncReceive)
 
   rcv_thread.join();
 }
-
 
 // Send and Receive a small Hello World message using the sync API
 TEST(EcalUdpSocket, SyncHelloWorldMessage)
@@ -327,6 +334,13 @@ TEST(EcalUdpSocket, SyncBigMessage)
                             {
                               asio::error_code ec;
                               rcv_socket.bind(asio::ip::udp::endpoint(asio::ip::address_v4::loopback(), 14000), ec);
+                              ASSERT_FALSE(ec);
+                            }
+
+                            // Set a big receive buffer size, so we will not lose fragments
+                            {
+                              asio::error_code ec;
+                              rcv_socket.set_option(asio::socket_base::receive_buffer_size(1024 * 1024 * 5), ec);
                               ASSERT_FALSE(ec);
                             }
       
