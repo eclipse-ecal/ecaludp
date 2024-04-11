@@ -169,6 +169,8 @@ TEST(EcalUdpSocket, AsyncBigMessage)
 // Send and Receive a small Hello World message using the sync API
 TEST(EcalUdpSocket, SyncHelloWorldMessage)
 {
+  atomic_signalable<int> received_messages(0);
+
   asio::io_context io_context; // Will never be started, as we are using the sync API exclusively
 
   // Create a send and recieve socket
@@ -176,7 +178,7 @@ TEST(EcalUdpSocket, SyncHelloWorldMessage)
   ecaludp::Socket rev_socket (io_context, {'E', 'C', 'A', 'L'});
 
   // Create a thread that will receive a message
-  std::thread recv_thread([&rev_socket]()
+  std::thread recv_thread([&rev_socket, &received_messages]()
                           {
                             // Open the socket
                             {
@@ -197,6 +199,8 @@ TEST(EcalUdpSocket, SyncHelloWorldMessage)
                             // Receive a message
                             asio::error_code ec;
                             auto received_buffer = rev_socket.receive_from(sender_endpoint, 0, ec);
+
+                            received_messages++;
     
                             ASSERT_FALSE(ec);
 
@@ -205,8 +209,8 @@ TEST(EcalUdpSocket, SyncHelloWorldMessage)
                             ASSERT_EQ(received_string, std::string("Hello World!"));
                           });
 
-  // Wait a millisecond to make sure that the receiver is ready
-  std::this_thread::sleep_for(std::chrono::milliseconds(1));
+  // Wait 10 milliseconds to make sure that the receiver is ready
+  std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
   // Create destination endpoint
   asio::ip::udp::endpoint destination(asio::ip::address_v4::loopback(), 14000);
@@ -223,36 +227,45 @@ TEST(EcalUdpSocket, SyncHelloWorldMessage)
     ASSERT_FALSE(ec);
   }
 
+  // Wait up to 1 second for the message to be received
+  received_messages.wait_for([](int v) { return v == 1; }, std::chrono::milliseconds(1000));
+
+  // Close the sockets
+  send_socket.close();
+  rev_socket.close();
+
   recv_thread.join();
 }
 
 // Send and Receive a big message using the sync API
 TEST(EcalUdpSocket, SyncBigMessage)
 {
+  atomic_signalable<int> received_messages(0);
+
   asio::io_context io_context; // Will never be started, as we are using the sync API exclusively
 
   // Create a send and recieve socket
   ecaludp::Socket send_socket(io_context, {'E', 'C', 'A', 'L'});
-  ecaludp::Socket rev_socket (io_context, {'E', 'C', 'A', 'L'});
+  ecaludp::Socket rcv_socket (io_context, {'E', 'C', 'A', 'L'});
   
   // Create the message to send and fill it with random characters
   std::string message_to_send(1024 * 1024, 'a');
   std::generate(message_to_send.begin(), message_to_send.end(), []() { return static_cast<char>(std::rand()); });
 
   // Create a thread that will receive a message
-  std::thread recv_thread([&rev_socket, &message_to_send]()
+  std::thread recv_thread([&rcv_socket, &message_to_send, &received_messages]()
                           {
                             // Open the socket
                             {
                               asio::error_code ec;
-                              rev_socket.open(asio::ip::udp::v4(), ec);
+                              rcv_socket.open(asio::ip::udp::v4(), ec);
                               ASSERT_FALSE(ec);
                             }
     
                             // Bind the socket
                             {
                               asio::error_code ec;
-                              rev_socket.bind(asio::ip::udp::endpoint(asio::ip::address_v4::loopback(), 14000), ec);
+                              rcv_socket.bind(asio::ip::udp::endpoint(asio::ip::address_v4::loopback(), 14000), ec);
                               ASSERT_FALSE(ec);
                             }
     
@@ -260,7 +273,9 @@ TEST(EcalUdpSocket, SyncBigMessage)
     
                             // Receive a message
                             asio::error_code ec;
-                            auto received_buffer = rev_socket.receive_from(sender_endpoint, 0, ec);
+                            auto received_buffer = rcv_socket.receive_from(sender_endpoint, 0, ec);
+
+                            received_messages++;
     
                             ASSERT_FALSE(ec);
 
@@ -269,8 +284,8 @@ TEST(EcalUdpSocket, SyncBigMessage)
                             ASSERT_EQ(received_string, message_to_send);
                           });
 
-  // Wait a millisecond to make sure that the receiver is ready
-  std::this_thread::sleep_for(std::chrono::milliseconds(1));
+  // Wait 10 milliseconds to make sure that the receiver is ready
+  std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
   // Create destination endpoint
   asio::ip::udp::endpoint destination(asio::ip::address_v4::loopback(), 14000);
@@ -284,6 +299,13 @@ TEST(EcalUdpSocket, SyncBigMessage)
       std::cerr << ec.message() << std::endl;
     ASSERT_FALSE(ec);
   }
+
+  // Wait up to 1 second for the message to be received
+  received_messages.wait_for([](int v) { return v == 1; }, std::chrono::milliseconds(1000));
+
+  // Close the sockets
+  send_socket.close();
+  rcv_socket.close();
 
   recv_thread.join();
 }
