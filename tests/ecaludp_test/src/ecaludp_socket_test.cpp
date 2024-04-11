@@ -210,7 +210,7 @@ TEST(EcalUdpSocket, SyncHelloWorldMessage)
 
   // Create destination endpoint
   asio::ip::udp::endpoint destination(asio::ip::address_v4::loopback(), 14000);
-  send_socket.connect(destination);
+  send_socket.open(destination.protocol());
 
   std::string message_to_send("Hello World!");
 
@@ -274,7 +274,7 @@ TEST(EcalUdpSocket, SyncBigMessage)
 
   // Create destination endpoint
   asio::ip::udp::endpoint destination(asio::ip::address_v4::loopback(), 14000);
-  send_socket.connect(destination);
+  send_socket.open(destination.protocol());
 
   // Send a message
   {
