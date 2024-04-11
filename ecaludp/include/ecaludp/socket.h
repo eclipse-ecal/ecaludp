@@ -107,7 +107,7 @@ namespace ecaludp
 
     bool native_non_blocking() const                                                             { return socket_.native_non_blocking(); }
     void native_non_blocking(bool mode)                                                          { socket_.native_non_blocking(mode); }
-    void native_non_blocking(bool mode, asio::error_code& ec)                                    { socket_.native_non_blocking(mode, ec); }
+    ASIO_SYNC_OP_VOID native_non_blocking(bool mode, asio::error_code& ec)                       { ASIO_SYNC_OP_VOID_RETURN(socket_.native_non_blocking(mode, ec)); }
 
     void open(const asio::ip::udp& protocol)                                                     { socket_.open(protocol); }
     asio::error_code open(const asio::ip::udp& protocol, asio::error_code& ec)                   { return socket_.open(protocol, ec); }
@@ -129,19 +129,32 @@ namespace ecaludp
   // Sending
   /////////////////////////////////////////////////////////////////
   public:
+    // TODO: Revise if I should add additional overloads
+    ECALUDP_EXPORT std::size_t send_to(const std::vector<asio::const_buffer>& buffer_sequence
+                                      , const asio::ip::udp::endpoint& destination
+                                      , asio::socket_base::message_flags flags
+                                      , asio::error_code& ec);
+
     ECALUDP_EXPORT void async_send_to(const std::vector<asio::const_buffer>& buffer_sequence
                                     , const asio::ip::udp::endpoint& destination
                                     , const std::function<void(asio::error_code)>& completion_handler);
+
+    // TODO: Add overloads that take an asio::const_buffer without being an std::vector
 
     ECALUDP_EXPORT void set_max_udp_datagram_size(std::size_t max_udp_datagram_size);
     ECALUDP_EXPORT std::size_t get_max_udp_datagram_size() const;
 
     ECALUDP_EXPORT void set_max_reassembly_age(std::chrono::steady_clock::duration max_reassembly_age);
     ECALUDP_EXPORT std::chrono::steady_clock::duration get_max_reassembly_age() const;
+
   /////////////////////////////////////////////////////////////////
   // Receiving
   /////////////////////////////////////////////////////////////////
   public:
+    ECALUDP_EXPORT std::shared_ptr<ecaludp::OwningBuffer> receive_from(asio::ip::udp::endpoint& sender_endpoint
+                                                                     , asio::socket_base::message_flags flags
+                                                                     , asio::error_code& ec);
+
     ECALUDP_EXPORT void async_receive_from(asio::ip::udp::endpoint& sender_endpoint
                                   , const std::function<void(const std::shared_ptr<ecaludp::OwningBuffer>&, asio::error_code)>& completion_handler);
 
