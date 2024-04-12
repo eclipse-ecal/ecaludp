@@ -270,18 +270,41 @@ TEST(EcalUdpSocket, CancelSyncReceive)
   // Wait 10 milliseconds to make sure that the receiver is ready
   std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
-  // REQURIED FOR LINUX
+  // ----------------------------------------------------------
+  // How to cancel a synchronous receive_from on different OSes
+  // ----------------------------------------------------------
+  // 
+  // Canceling a synchronous call seems to be utterly complicated and
+  // inconsistent across different operating systems. This is what I have found:
+  // 
+  // Linux:
+  //   - shutdown() will unblock the call but NOT return an error
+  //   - cancel() will NOT unblock the call, but prevent further calls via an error
+  //   - close() will NOT unblock the call, but prevent further calls via an error
+  // 
+  // Windows:
+  //   - shutdown() will NOT unblock the call
+  //   - cancel() will unblock the call and return an error
+  //   - close() will unblock the call and return an error
+  //
+  // MacOS:
+  //   - shutdown() will NOT unblock the call
+  //   - cancel() will NOT unblock the call
+  //   - close() will unblock the call
+  //
+  // Portable solution: I suggest, calling shutdown() and close() in sequence.
+
+
   // On Linux, the receive call will NOT unblock via cancel(). We have to call shutdown() to unblock it.
   {
     asio::error_code ec;
     socket.shutdown(asio::socket_base::shutdown_both, ec); // On Linux this actually returns an error ("Transport endpoint is not connected"). I see no way to avoid this.
   }
 
-  // SOLUTION FOR ALL OTHER OPERATING SYSTEMS
-  // All other operating systems (that I tested with) will unblock the receive call via cancel()
+  // All other operating systems (that I tested with) will unblock the receive call via close()
   {
     asio::error_code ec;
-    socket.cancel(ec);
+    socket.close(ec);
     ASSERT_FALSE(ec);
   }
 
