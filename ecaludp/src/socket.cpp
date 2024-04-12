@@ -193,6 +193,22 @@ namespace ecaludp
         return nullptr;
       }
 
+      // TODO: Revise this code. I am not sure, if this should be here. But I see no other way to get this working on Linux.
+      // 
+      // The following code exists due to a Linux issue:
+      // - On Linux, calling close() or cancel() does not cause the synchronous receive_from() to return at all.
+      // - The only way to un-block this call is to call shutdown() on the socket.
+      // - However, calling shutdown does NOT cause an error to be set. Thus, we have no idea here, whether we have received a 0-byte datagram or whether an external thread has called shutdown().
+      // - After an external thread has called shutdown(), each subsequent call to receive_from() will return 0 bytes without blocking.
+      // - This will cause a busy loop here
+      // - Thus, we need to check whether we have received a 0-byte datagram and whether the sender endpoint is still the default endpoint and break the busy loop in this case
+      // 
+      // I see this code as a workaround.
+      if ((bytes_received == 0) && (*sender_endpoint_of_this_datagram == asio::ip::udp::endpoint()))
+      {
+        return nullptr;
+      }
+
       // resize the buffer to the actually received size
       buffer->resize(bytes_received);
 

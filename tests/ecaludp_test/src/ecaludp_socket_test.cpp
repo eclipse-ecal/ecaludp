@@ -29,7 +29,54 @@
 #include <string>
 #include <thread>
 
-// TODO: Add a test for cancelling an async operation
+// Cancel a pending async receive
+TEST(EcalUdpSocket, CancelAsyncReceive)
+{
+  asio::io_context io_context;
+
+  // Create a socket
+  ecaludp::Socket socket(io_context, {'E', 'C', 'A', 'L'});
+
+  // Open the socket
+  {
+    asio::error_code ec;
+    socket.open(asio::ip::udp::v4(), ec);
+    ASSERT_EQ(ec, asio::error_code());
+  }
+
+  // Bind the socket
+  {
+    asio::error_code ec;
+    socket.bind(asio::ip::udp::endpoint(asio::ip::address_v4::loopback(), 14080), ec);
+    ASSERT_EQ(ec, asio::error_code());
+  }
+
+  auto work = std::make_unique<asio::io_context::work>(io_context);
+  std::thread io_thread([&io_context]() { io_context.run(); });
+
+  std::shared_ptr<asio::ip::udp::endpoint> sender_endpoint = std::make_shared<asio::ip::udp::endpoint>();
+
+  // Wait for the next message
+  socket.async_receive_from(*sender_endpoint
+                                , [sender_endpoint](const std::shared_ptr<ecaludp::OwningBuffer>& buffer, asio::error_code ec)
+                                  {
+                                    // We should have received an error
+                                    ASSERT_TRUE(ec);
+                                  });
+
+  // Wait 10 milliseconds to make sure that the receiver is ready
+  std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
+  // Cancel the receive
+  {
+    asio::error_code ec;
+    socket.cancel(ec);
+    ASSERT_FALSE(ec);
+  }
+
+  work.reset();
+  io_thread.join();
+}
 
 // Send and Receive a small Hello World message using the async API
 TEST(EcalUdpSocket, AsyncHelloWorldMessage)
@@ -206,32 +253,30 @@ TEST(EcalUdpSocket, CancelSyncReceive)
 
   // Create a thread that will receive a message
   std::thread rcv_thread([&socket]()
-                         {
-                           asio::ip::udp::endpoint sender_endpoint;
+                        {
+                          asio::ip::udp::endpoint sender_endpoint;
 
-                           // Receive a message
-                           asio::error_code ec;
-                           auto received_buffer = socket.receive_from(sender_endpoint, 0, ec);
+                          // Receive a message
+                          asio::error_code ec;
+                          auto received_buffer = socket.receive_from(sender_endpoint, 0, ec);
 
-                           // We should have received an error
-                           ASSERT_TRUE(ec);
-                         });
+                          #ifdef WIN32
+                          // We should have received an error
+                          // This only happens on Windows! Linux just returns "success"
+                          ASSERT_TRUE(ec); 
+                          #endif
+                        });
 
   // Wait 10 milliseconds to make sure that the receiver is ready
   std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
-  // Cancel the receive
+  // Test that a shutdown causes to blocking call to un-block
+  // Usually, the user should cancel() the socket. However, on Linux this only
+  // cancels asynchronous operations. A shutdown() call is needed to unblock the
+  // socket. This test checks if that works.
   {
-    std::cerr << "Closing socket...\n";
     asio::error_code ec;
-
-    socket.shutdown(asio::socket_base::shutdown_both, ec);
-    if (ec)
-      std::cerr << ec.message() << std::endl;
-
-    socket.close(ec);
-    if (ec)
-      std::cerr << ec.message() << std::endl;
+    socket.shutdown(asio::socket_base::shutdown_both, ec); // On Linux this actually returns an error ("Transport endpoint is not connected"). I see no way to avoid this.
   }
 
   rcv_thread.join();
