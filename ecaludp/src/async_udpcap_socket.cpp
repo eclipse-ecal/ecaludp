@@ -48,6 +48,25 @@ namespace ecaludp
       wait_thread_->join();
     }
   }
+  
+  /////////////////////////////////////////////////////
+  // Receive methods
+  /////////////////////////////////////////////////////
+  
+  size_t AsyncUdpcapSocket::receiveFrom(char*                 buffer
+                                      , size_t                max_buffer_size
+                                      , Udpcap::HostAddress&  sender_address
+                                      , uint16_t&             sender_port
+                                      , ecaludp::Error&       error)
+  {
+    Udpcap::Error udpcap_error = Udpcap::Error::GENERIC_ERROR;
+    const size_t received_bytes = udpcap_socket_.receiveDatagram(buffer, max_buffer_size, &sender_address, &sender_port, udpcap_error);
+
+    // Convert from Udpcap Error to ecaludp Error
+    toEcaludpError(udpcap_error, error);
+
+    return received_bytes;
+  }
 
   void AsyncUdpcapSocket::asyncReceiveFrom( char*                buffer
                                           , size_t               max_buffer_size
@@ -58,6 +77,32 @@ namespace ecaludp
     const std::unique_lock<std::mutex> lock(wait_thread_trigger_mutex_);
     async_receive_from_parameters_queue_.push_back({ buffer, max_buffer_size, &sender_address, &sender_port, read_handler });
     wait_thread_trigger_cv_.notify_one();
+  }
+
+  void AsyncUdpcapSocket::toEcaludpError(const Udpcap::Error& udpcap_error, ecaludp::Error& ecaludp_error)
+  {
+    switch (udpcap_error.GetErrorCode())
+    {
+    case Udpcap::Error::OK:
+      ecaludp_error = ecaludp::Error(ecaludp::Error::OK, udpcap_error.GetMessage());
+      break;
+    case Udpcap::Error::NPCAP_NOT_INITIALIZED:
+      ecaludp_error = ecaludp::Error(ecaludp::Error::NPCAP_NOT_INITIALIZED, udpcap_error.GetMessage());
+      break;
+    case Udpcap::Error::NOT_BOUND:
+      ecaludp_error = ecaludp::Error(ecaludp::Error::NOT_BOUND, udpcap_error.GetMessage());
+      break;
+    case Udpcap::Error::SOCKET_CLOSED:
+      ecaludp_error = ecaludp::Error(ecaludp::Error::SOCKET_CLOSED, udpcap_error.GetMessage());
+      break;
+    case Udpcap::Error::GENERIC_ERROR:
+      ecaludp_error = ecaludp::Error(ecaludp::Error::GENERIC_ERROR, udpcap_error.GetMessage());
+      break;
+    default:
+      // Default to generic error with entire Udpcap Error message string
+      ecaludp_error = ecaludp::Error(ecaludp::Error::GENERIC_ERROR, "Unknown Udpcap Error: " + udpcap_error.ToString());
+      break;
+    }
   }
 
   /////////////////////////////////////////////////////
@@ -123,28 +168,7 @@ namespace ecaludp
           
       // Convert from Udpcap Error to ecaludp Error
       ecaludp::Error ecaludp_error = ecaludp::Error::GENERIC_ERROR;
-      switch (error.GetErrorCode())
-      {
-      case Udpcap::Error::OK:
-        ecaludp_error = ecaludp::Error(ecaludp::Error::OK, error.GetMessage());
-        break;
-      case Udpcap::Error::NPCAP_NOT_INITIALIZED:
-        ecaludp_error = ecaludp::Error(ecaludp::Error::NPCAP_NOT_INITIALIZED, error.GetMessage());
-        break;
-      case Udpcap::Error::NOT_BOUND:
-        ecaludp_error = ecaludp::Error(ecaludp::Error::NOT_BOUND, error.GetMessage());
-        break;
-      case Udpcap::Error::SOCKET_CLOSED:
-        ecaludp_error = ecaludp::Error(ecaludp::Error::SOCKET_CLOSED, error.GetMessage());
-        break;
-      case Udpcap::Error::GENERIC_ERROR:
-        ecaludp_error = ecaludp::Error(ecaludp::Error::GENERIC_ERROR, error.GetMessage());
-        break;
-      default:
-        // Default to generic error with entire Udpcap Error message string
-        ecaludp_error = ecaludp::Error(ecaludp::Error::GENERIC_ERROR, "Unknown Udpcap Error: " + error.ToString());
-        break;
-      }
+      toEcaludpError(error, ecaludp_error);
 
       // Call the read_handler_ with the error
       next_async_receive_from_parameters.read_handler_(ecaludp_error, rec_bytes);

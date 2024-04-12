@@ -61,14 +61,23 @@ namespace ecaludp
     void close                      ();
 
   /////////////////////////////////////////////////////
-  // Public Methods
+  // Receive methods
   /////////////////////////////////////////////////////
   public:
+    size_t receiveFrom(char*                 buffer
+                      , size_t               max_buffer_size
+                      , Udpcap::HostAddress& sender_address
+                      , uint16_t&            sender_port
+                      , ecaludp::Error&       error);
+
     void asyncReceiveFrom( char*                buffer
                          , size_t               max_buffer_size
                          , Udpcap::HostAddress& sender_address
                          , uint16_t&            sender_port
                          , const std::function<void(ecaludp::Error&, size_t)>& read_handler);
+
+  private:
+    static void toEcaludpError(const Udpcap::Error& udpcap_error, ecaludp::Error& ecaludp_error);
 
   /////////////////////////////////////////////////////
   // Wait thread function
