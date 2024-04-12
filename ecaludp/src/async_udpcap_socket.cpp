@@ -60,7 +60,7 @@ namespace ecaludp
                                       , ecaludp::Error&       error)
   {
     Udpcap::Error udpcap_error = Udpcap::Error::GENERIC_ERROR;
-    size_t received_bytes = udpcap_socket_.receiveDatagram(buffer, max_buffer_size, &sender_address, &sender_port, udpcap_error);
+    const size_t received_bytes = udpcap_socket_.receiveDatagram(buffer, max_buffer_size, &sender_address, &sender_port, udpcap_error);
 
     // Convert from Udpcap Error to ecaludp Error
     toEcaludpError(udpcap_error, error);
