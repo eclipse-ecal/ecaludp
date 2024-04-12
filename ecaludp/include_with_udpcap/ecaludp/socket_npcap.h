@@ -87,6 +87,8 @@ namespace ecaludp
   // Receiving
   /////////////////////////////////////////////////////////////////
   public:
+    ECALUDP_EXPORT std::shared_ptr<ecaludp::OwningBuffer> receive_from(asio::ip::udp::endpoint& sender_endpoint, ecaludp::Error& error);
+
     ECALUDP_EXPORT void async_receive_from(asio::ip::udp::endpoint& sender_endpoint
                                   , const std::function<void(const std::shared_ptr<ecaludp::OwningBuffer>&, ecaludp::Error)>& completion_handler);
 

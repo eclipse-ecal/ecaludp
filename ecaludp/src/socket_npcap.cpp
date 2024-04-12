@@ -97,6 +97,51 @@ namespace ecaludp
   // Receiving
   /////////////////////////////////////////////////////////////////
   
+  std::shared_ptr<ecaludp::OwningBuffer> SocketNpcap::receive_from(asio::ip::udp::endpoint& sender_endpoint, ecaludp::Error& error)
+  {
+    while (true)
+    {
+      auto datagram_buffer = datagram_buffer_pool_->allocate();
+      datagram_buffer->resize(65535); // Max UDP datagram size
+
+      auto buffer = datagram_buffer_pool_->allocate();
+      buffer->resize(65535); // max datagram size
+
+      auto sender_address = std::make_shared<Udpcap::HostAddress>();
+      auto sender_port    = std::make_shared<uint16_t>();
+
+      size_t bytes_received = socket_->receiveFrom(reinterpret_cast<char*>(buffer->data())
+                                                  , buffer->size()
+                                                  , *sender_address
+                                                  , *sender_port
+                                                  , error);
+
+      if (error)
+      {
+        return nullptr;
+      }
+
+      // resize the buffer to the actually received size
+      buffer->resize(bytes_received);
+
+      // Convert sender address and port to asio
+      auto sender_endpoint_of_this_datagram = std::make_shared<asio::ip::udp::endpoint>(asio::ip::make_address(sender_address->toString()), *sender_port);
+
+      // Handle the datagram. Discard the error, as we don't really want to
+      // react on faulty datagrams here. Those will just be dropped and we will
+      // continue to receive the next one.
+      ecaludp::Error handle_datagram_error = ecaludp::Error::ErrorCode::GENERIC_ERROR;
+      auto completed_package = this->handle_datagram(buffer, sender_endpoint_of_this_datagram, handle_datagram_error);
+
+      if (completed_package != nullptr)
+      {
+        sender_endpoint = *sender_endpoint_of_this_datagram;
+        return completed_package;
+      }
+    }
+  }
+  
+  
   void SocketNpcap::async_receive_from(asio::ip::udp::endpoint& sender_endpoint
                                       , const std::function<void(const std::shared_ptr<ecaludp::OwningBuffer>&, ecaludp::Error)>& completion_handler)
   {
