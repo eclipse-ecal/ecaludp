@@ -21,6 +21,8 @@
 #include <cstdint>
 #include <vector>
 
+#include <asio.hpp> // IWYU pragma: keep
+
 namespace ecaludp
 {
   namespace v5

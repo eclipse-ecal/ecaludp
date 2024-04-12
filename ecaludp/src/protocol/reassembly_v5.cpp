@@ -29,6 +29,8 @@
 #include <memory>
 #include <string>
 
+#include <asio.hpp> // IWYU pragma: keep
+
 namespace ecaludp
 {
   namespace v5
