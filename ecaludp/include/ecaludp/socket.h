@@ -153,8 +153,6 @@ namespace ecaludp
       async_send_to(std::vector<asio::const_buffer>{buffer}, destination, completion_handler);
     }
 
-    // TODO: Add overloads that take an asio::const_buffer without being an std::vector
-
     ECALUDP_EXPORT void set_max_udp_datagram_size(std::size_t max_udp_datagram_size);
     ECALUDP_EXPORT std::size_t get_max_udp_datagram_size() const;
 
