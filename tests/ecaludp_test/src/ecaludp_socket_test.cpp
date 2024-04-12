@@ -127,7 +127,7 @@ TEST(EcalUdpSocket, AsyncHelloWorldMessage)
                                   });
 
   // Send a message
-  socket.async_send_to({ asio::buffer(*message_to_send) }
+  socket.async_send_to(asio::buffer(*message_to_send)
                       , asio::ip::udp::endpoint(asio::ip::address_v4::loopback()
                       , 14000)
                       , [message_to_send](asio::error_code ec)
@@ -211,7 +211,7 @@ TEST(EcalUdpSocket, AsyncBigMessage)
                                   });
 
   // Send a message
-  socket.async_send_to({ asio::buffer(*message_to_send) }
+  socket.async_send_to(asio::buffer(*message_to_send)
                       , asio::ip::udp::endpoint(asio::ip::address_v4::loopback()
                       , 14000)
                       , [message_to_send](asio::error_code ec)
@@ -366,7 +366,7 @@ TEST(EcalUdpSocket, SyncHelloWorldMessage)
   // Send a message
   {
     asio::error_code ec;
-    send_socket.send_to({ asio::buffer(message_to_send)}, destination, 0, ec);
+    send_socket.send_to(asio::buffer(message_to_send), destination, 0, ec);
     if (ec)
       std::cerr << ec.message() << std::endl;
     ASSERT_FALSE(ec);
@@ -458,7 +458,7 @@ TEST(EcalUdpSocket, SyncBigMessage)
   // Send a message
   {
     asio::error_code ec;
-    send_socket.send_to({ asio::buffer(message_to_send)}, destination, 0, ec);
+    send_socket.send_to(asio::buffer(message_to_send), destination, 0, ec);
     if (ec)
       std::cerr << ec.message() << std::endl;
     ASSERT_FALSE(ec);

@@ -53,7 +53,7 @@ int main()
                                   });
 
   // Send a message
-  socket.async_send_to({ asio::buffer(*message_to_send) }
+  socket.async_send_to(asio::buffer(*message_to_send)
                       , asio::ip::udp::endpoint(asio::ip::address_v4::loopback()
                       , 14000)
                       , [message_to_send](asio::error_code ec)

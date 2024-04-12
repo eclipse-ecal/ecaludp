@@ -99,7 +99,7 @@ TEST(EcalUdpNpcapSocket, AsyncHelloWorldMessage)
                                     });
 
   // Send a message
-  sender_socket.async_send_to({ asio::buffer(*message_to_send) }
+  sender_socket.async_send_to(asio::buffer(*message_to_send)
                       , asio::ip::udp::endpoint(asio::ip::address_v4::loopback()
                       , 14000)
                       , [message_to_send](asio::error_code ec)
@@ -169,7 +169,7 @@ TEST(EcalUdpSocket, AsyncBigMessage)
                                     });
 
   // Send a message
-  sender_socket.async_send_to({ asio::buffer(*message_to_send) }
+  sender_socket.async_send_to(asio::buffer(*message_to_send)
                               , asio::ip::udp::endpoint(asio::ip::address_v4::loopback()
                               , 14000)
                               , [message_to_send](asio::error_code ec)
@@ -235,7 +235,7 @@ TEST(ecalupd, AsyncZeroByteMessage)
                                       });
     
   // Send a message
-  sender_socket.async_send_to({ asio::buffer(*message_to_send) }
+  sender_socket.async_send_to(asio::buffer(*message_to_send)
                               , asio::ip::udp::endpoint(asio::ip::address_v4::loopback()
                               , 14000)
                               , [message_to_send](asio::error_code ec)
@@ -334,7 +334,7 @@ TEST(ecaludp, SyncHelloWorldMessage)
   // Send a message
   {
     asio::error_code ec;
-    sender_socket.send_to({ asio::buffer(*message_to_send) }
+    sender_socket.send_to(asio::buffer(*message_to_send)
                         , asio::ip::udp::endpoint(asio::ip::address_v4::loopback(), 14000)
                         , 0
                         , ec);
@@ -413,7 +413,7 @@ TEST(ecaludp, SyncBigMessage)
   // Send a message
   {
       asio::error_code ec;
-      sender_socket.send_to({ asio::buffer(*message_to_send) }
+      sender_socket.send_to(asio::buffer(*message_to_send)
                           , asio::ip::udp::endpoint(asio::ip::address_v4::loopback(), 14000)
                           , 0
                           , ec);

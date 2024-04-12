@@ -129,15 +129,29 @@ namespace ecaludp
   // Sending
   /////////////////////////////////////////////////////////////////
   public:
-    // TODO: Revise if I should add additional overloads
     ECALUDP_EXPORT std::size_t send_to(const std::vector<asio::const_buffer>& buffer_sequence
                                       , const asio::ip::udp::endpoint& destination
                                       , asio::socket_base::message_flags flags
                                       , asio::error_code& ec);
 
+    inline std::size_t send_to(const asio::const_buffer& buffer
+                              , const asio::ip::udp::endpoint& destination
+                              , asio::socket_base::message_flags flags
+                              , asio::error_code& ec)
+    {
+      return send_to(std::vector<asio::const_buffer>{buffer}, destination, flags, ec);
+    }
+
     ECALUDP_EXPORT void async_send_to(const std::vector<asio::const_buffer>& buffer_sequence
                                     , const asio::ip::udp::endpoint& destination
                                     , const std::function<void(asio::error_code)>& completion_handler);
+
+    inline void async_send_to(const asio::const_buffer& buffer
+                            , const asio::ip::udp::endpoint& destination
+                            , const std::function<void(asio::error_code)>& completion_handler)
+    {
+      async_send_to(std::vector<asio::const_buffer>{buffer}, destination, completion_handler);
+    }
 
     // TODO: Add overloads that take an asio::const_buffer without being an std::vector
 
