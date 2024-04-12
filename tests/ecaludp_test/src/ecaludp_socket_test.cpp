@@ -270,13 +270,19 @@ TEST(EcalUdpSocket, CancelSyncReceive)
   // Wait 10 milliseconds to make sure that the receiver is ready
   std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
-  // Test that a shutdown causes to blocking call to un-block
-  // Usually, the user should cancel() the socket. However, on Linux this only
-  // cancels asynchronous operations. A shutdown() call is needed to unblock the
-  // socket. This test checks if that works.
+  // REQURIED FOR LINUX
+  // On Linux, the receive call will NOT unblock via cancel(). We have to call shutdown() to unblock it.
   {
     asio::error_code ec;
     socket.shutdown(asio::socket_base::shutdown_both, ec); // On Linux this actually returns an error ("Transport endpoint is not connected"). I see no way to avoid this.
+  }
+
+  // SOLUTION FOR ALL OTHER OPERATING SYSTEMS
+  // All other operating systems (that I tested with) will unblock the receive call via cancel()
+  {
+    asio::error_code ec;
+    socket.cancel(ec);
+    ASSERT_FALSE(ec);
   }
 
   rcv_thread.join();
