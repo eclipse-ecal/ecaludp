@@ -16,11 +16,13 @@
 
 #pragma once
 
-#include <thread>
+#include <condition_variable>
+#include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <mutex>
-
-#include <atomic>
+#include <string>
+#include <thread>
 
 class Sender
 {

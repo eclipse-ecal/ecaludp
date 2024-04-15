@@ -14,13 +14,15 @@
  * SPDX-License-Identifier: Apache-2.0
  ********************************************************************************/
 
-#include <array>
+#include <algorithm>
 #include <chrono>
+#include <cstddef>
 #include <iostream>
-#include <memory>
 #include <string>
 
 #include <asio.hpp> // IWYU pragma: keep
+#include <thread>
+#include <vector>
 
 #include "sender_sync.h"
 #include "receiver_sync.h"

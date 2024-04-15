@@ -15,9 +15,17 @@
  ********************************************************************************/
 
 #include "sender_sync.h"
+#include "ecaludp/socket.h"
+#include "sender.h"
 
+#include <cstddef>
 #include <iostream>
+#include <memory>
+#include <mutex>
 #include <string>
+
+#include <asio.hpp>
+#include <thread>
 
 SenderSync::SenderSync(size_t message_size, size_t max_udp_datagram_size, int buffer_size)
   : Sender(message_size, max_udp_datagram_size, buffer_size)

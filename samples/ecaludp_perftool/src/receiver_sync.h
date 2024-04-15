@@ -21,9 +21,6 @@
 #include <memory>
 #include <thread>
 
-#include <asio.hpp>
-#include <ecaludp/socket.h>
-
 class ReceiverSync : public Receiver
 {
   public:

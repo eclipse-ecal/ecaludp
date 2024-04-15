@@ -16,9 +16,16 @@
 
 #include "sender.h"
 
-#include <sstream>
-#include <iostream>
+#include <chrono>
+#include <cstddef>
 #include <iomanip>
+#include <iostream>
+#include <memory>
+#include <mutex>
+#include <sstream>
+#include <string>
+#include <thread>
+#include <utility>
 
 Sender::Sender(size_t message_size, size_t max_udp_datagram_size, int buffer_size)
   : message_size_         {message_size}

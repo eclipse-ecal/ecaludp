@@ -18,11 +18,9 @@
 
 #include "sender.h"
 
+#include <cstddef>
 #include <memory>
 #include <thread>
-
-#include <asio.hpp>
-#include <ecaludp/socket.h>
 
 class SenderSync : public Sender
 {

@@ -15,9 +15,15 @@
  ********************************************************************************/
 
 #include "receiver_sync.h"
+#include "ecaludp/socket.h"
+#include "receiver.h"
 
 #include <iostream>
-#include <string>
+#include <memory>
+#include <mutex>
+
+#include <asio.hpp>
+#include <thread>
 
 ReceiverSync::ReceiverSync(int buffer_size)
   : Receiver(buffer_size)
