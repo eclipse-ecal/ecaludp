@@ -15,20 +15,23 @@
  ********************************************************************************/
 
 #include "sender_sync.h"
-#include "ecaludp/socket.h"
-#include "sender.h"
 
 #include <cstddef>
 #include <iostream>
 #include <memory>
 #include <mutex>
 #include <string>
-
-#include <asio.hpp>
 #include <thread>
 
-SenderSync::SenderSync(size_t message_size, size_t max_udp_datagram_size, int buffer_size)
-  : Sender(message_size, max_udp_datagram_size, buffer_size)
+#include <asio.hpp>
+
+#include "ecaludp/socket.h"
+#include "sender.h"
+#include "sender_parameters.h"
+#include "socket_builder_asio.h"
+
+SenderSync::SenderSync(const SenderParameters& parameters)
+  : Sender(parameters)
 {
   std::cout << "Sender implementation: Synchronous asio" << std::endl;
 }
@@ -50,42 +53,25 @@ void SenderSync::send_loop()
 {
   asio::io_context io_context;
 
-  ecaludp::Socket         send_socket(io_context, {'E', 'C', 'A', 'L'});
-  asio::ip::udp::endpoint destination(asio::ip::address_v4::loopback(), 14000);
-
-  send_socket.set_max_udp_datagram_size(max_udp_datagram_size_);
-
+  std::shared_ptr<ecaludp::Socket> send_socket;
+  try
   {
-    asio::error_code ec;
-    send_socket.open(destination.protocol(), ec);
-    if (ec)
-    {
-      std::cerr << "Error opening socket: " << ec.message() << std::endl;
-      return;
-    }
+     send_socket = SocketBuilderAsio::CreateSendSocket(io_context, parameters_);
+  }
+  catch (const std::exception& e)
+  {
+    std::cerr << "Error creating socket: " << e.what() << std::endl;
+    return; // TODO: Exit the app?
   }
 
-  // Set sent buffer size
-  if (buffer_size_ > 0)
-  {
-    asio::socket_base::send_buffer_size option(buffer_size_);
-
-    asio::error_code ec;
-    send_socket.set_option(option, ec);
-    if (ec)
-    {
-      std::cerr << "Error setting send buffer size: " << ec.message() << std::endl;
-    }
-  }
-
-  std::string message = std::string(message_size_, 'a');
+  std::string message = std::string(parameters_.message_size, 'a');
+  asio::ip::udp::endpoint destination(asio::ip::address::from_string(parameters_.ip), parameters_.port);
 
   while (true)
   {
     {
-
       asio::error_code ec;
-      auto bytes_sent = send_socket.send_to(asio::buffer(message), destination, 0, ec);
+      auto bytes_sent = send_socket->send_to(asio::buffer(message), destination, 0, ec);
 
       if (ec)
       {
@@ -108,7 +94,7 @@ void SenderSync::send_loop()
 
   {
     asio::error_code ec;
-    send_socket.shutdown(asio::socket_base::shutdown_both, ec);
+    send_socket->shutdown(asio::socket_base::shutdown_both, ec);
     if (ec)
     {
       std::cerr << "Error shutting down socket: " << ec.message() << std::endl;
@@ -117,7 +103,7 @@ void SenderSync::send_loop()
 
   {
     asio::error_code ec;
-    send_socket.close(ec);
+    send_socket->close(ec);
     if (ec)
     {
       std::cerr << "Error closing socket: " << ec.message() << std::endl;

@@ -16,23 +16,17 @@
 
 #pragma once
 
-#include "sender.h"
-
-#include <cstddef>
 #include <memory>
-#include <thread>
 
-class SenderSync : public Sender
+#include <ecaludp/socket.h>
+
+#include <asio.hpp> // IWYU pragma: keep
+
+#include "sender_parameters.h"
+#include "receiver_parameters.h"
+
+namespace SocketBuilderAsio
 {
-  public:
-    SenderSync(const SenderParameters& parameters);
-    ~SenderSync() override;
-
-    void start() override;
-
-  private:
-    void send_loop();
-
-  private:
-    std::unique_ptr<std::thread> send_thread_;
-};
+  std::shared_ptr<ecaludp::Socket> CreateSendSocket   (asio::io_context& io_context, const SenderParameters&   parameters);
+  std::shared_ptr<ecaludp::Socket> CreateReceiveSocket(asio::io_context& io_context, const ReceiverParameters& parameters);
+}

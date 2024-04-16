@@ -16,15 +16,17 @@
 
 #pragma once
 
-#include <thread>
+#include <condition_variable>
 #include <memory>
 #include <mutex>
-#include <condition_variable>
+#include <thread>
+
+#include "receiver_parameters.h"
 
 class Receiver
 {
 public:
-  Receiver(int buffer_size);
+  Receiver(const ReceiverParameters& parameters);
   virtual ~Receiver();
 
   virtual void start() = 0;
@@ -37,7 +39,7 @@ private:
 ///////////////////////////////////////////////////////////
 
 protected:
-  int                           buffer_size_;
+  ReceiverParameters            parameters_;
 
   bool                          is_stopped_         {false};
   mutable std::mutex            statistics_mutex_;

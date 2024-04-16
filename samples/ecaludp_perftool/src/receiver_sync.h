@@ -24,7 +24,7 @@
 class ReceiverSync : public Receiver
 {
   public:
-    ReceiverSync(int buffer_size);
+    ReceiverSync(const ReceiverParameters& parameters);
     ~ReceiverSync() override;
 
     void start() override;

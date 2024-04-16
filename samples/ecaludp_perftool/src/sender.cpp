@@ -27,17 +27,14 @@
 #include <thread>
 #include <utility>
 
-Sender::Sender(size_t message_size, size_t max_udp_datagram_size, int buffer_size)
-  : message_size_         {message_size}
-  , max_udp_datagram_size_{max_udp_datagram_size}
-  , buffer_size_          {buffer_size}
+#include "sender_parameters.h"
+
+Sender::Sender(const SenderParameters& parameters)
+  : parameters_(parameters)
   , statistics_thread_{std::make_unique<std::thread>([this]() { this->print_statistics(); })}
 {
   // Print information for debug purposes
-  std::cout << "Sending data: " << std::endl;
-  std::cout << "  Message size:          " << message_size_ << std::endl;
-  std::cout << "  Max UDP datagram size: " << max_udp_datagram_size_ << std::endl;
-  std::cout << "  Buffer size:           " << (buffer_size_ > 0  ? std::to_string(buffer_size_) : "default") << std::endl;
+  std::cout << parameters_.to_string();
 }
 
 Sender::~Sender()
@@ -90,7 +87,8 @@ void Sender::print_statistics()
       std::stringstream ss;
       ss << "cnt: "   << messages_sent;
       ss << " | ";
-      ss << "snt raw: " << bytes_raw << " pyld: " << bytes_payload;
+      //ss << "snt raw: " << bytes_raw << " pyld: " << bytes_payload; // TODO: The async send doesn't return the raw number of bytes sent
+      ss << "snt pyld: " << bytes_payload;
       ss << " | ";
       ss << "freq: " << std::fixed << std::setprecision(1) << frequency;
 

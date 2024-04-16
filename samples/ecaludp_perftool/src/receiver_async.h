@@ -16,23 +16,29 @@
 
 #pragma once
 
-#include "sender.h"
+#include "receiver.h"
 
-#include <cstddef>
 #include <memory>
 #include <thread>
 
-class SenderSync : public Sender
+#include <asio.hpp>
+
+#include <ecaludp/socket.h>
+
+class ReceiverAsync : public Receiver
 {
   public:
-    SenderSync(const SenderParameters& parameters);
-    ~SenderSync() override;
+    ReceiverAsync(const ReceiverParameters& parameters);
+    ~ReceiverAsync() override;
 
     void start() override;
 
   private:
-    void send_loop();
+    void receive_message();
 
   private:
-    std::unique_ptr<std::thread> send_thread_;
+    std::unique_ptr<std::thread>            io_context_thread_;
+    asio::io_context                        io_context_;
+    std::shared_ptr<ecaludp::Socket>        socket_;
+    std::unique_ptr<asio::io_context::work> work_;
 };

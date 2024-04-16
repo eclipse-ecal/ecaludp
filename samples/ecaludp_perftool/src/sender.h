@@ -24,10 +24,12 @@
 #include <string>
 #include <thread>
 
+#include "sender_parameters.h"
+
 class Sender
 {
 public:
-  Sender(size_t message_size, size_t max_udp_datagram_size, int buffer_size);
+  Sender(const SenderParameters& parameters);
   virtual ~Sender();
 
   virtual void start() = 0;
@@ -40,11 +42,7 @@ private:
 ///////////////////////////////////////////////////////////
 
 protected:
-  std::string                   ip_;
-  uint16_t                      port_;
-  size_t                        message_size_;
-  size_t                        max_udp_datagram_size_;
-  int                           buffer_size_;
+  SenderParameters              parameters_;
 
   bool                          is_stopped_         {false};
   mutable std::mutex            statistics_mutex_;

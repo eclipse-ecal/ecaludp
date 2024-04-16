@@ -25,12 +25,20 @@ set(sources
   src/main.cpp
   src/receiver.cpp
   src/receiver.h
+  src/receiver_async.cpp
+  src/receiver_async.h
+  src/receiver_parameters.h
   src/receiver_sync.cpp
   src/receiver_sync.h
   src/sender.cpp
   src/sender.h
+  src/sender_async.cpp
+  src/sender_async.h
+  src/sender_parameters.h
   src/sender_sync.cpp
   src/sender_sync.h
+  src/socket_builder_asio.cpp
+  src/socket_builder_asio.h
 )
 
 add_executable(${PROJECT_NAME} ${sources})

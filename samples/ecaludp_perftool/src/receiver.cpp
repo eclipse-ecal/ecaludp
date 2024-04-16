@@ -26,13 +26,12 @@
 #include <thread>
 #include <utility>
 
-Receiver::Receiver(int buffer_size)
-  : buffer_size_(buffer_size)
+Receiver::Receiver(const ReceiverParameters& parameters)
+  : parameters_(parameters)
   , statistics_thread_{std::make_unique<std::thread>([this]() { this->print_statistics(); })}
 {
   // Print information for debug purposes
-  std::cout << "Receiving data: " << std::endl;
-  std::cout << "  buffer size: " << (buffer_size_ > 0 ? std::to_string(buffer_size_) : "default") << std::endl;
+  std::cout << parameters_.to_string();
 }
 
 Receiver::~Receiver()

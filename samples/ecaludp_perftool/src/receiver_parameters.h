@@ -16,23 +16,25 @@
 
 #pragma once
 
-#include "sender.h"
+#include <cstdint>
+#include <sstream>
+#include <string>
 
-#include <cstddef>
-#include <memory>
-#include <thread>
-
-class SenderSync : public Sender
+struct ReceiverParameters
 {
-  public:
-    SenderSync(const SenderParameters& parameters);
-    ~SenderSync() override;
+  std::string ip          {"127.0.0.1"};
+  uint16_t    port        {14000};
+  int         buffer_size {-1};
 
-    void start() override;
+  std::string to_string() const
+  {
+    std::stringstream ss;
 
-  private:
-    void send_loop();
+    ss << "Receiver Parameters: " << std::endl;
+    ss << "  IP:          " << ip << std::endl;
+    ss << "  Port:        " << port << std::endl;
+    ss << "  Buffer Size: " << (buffer_size > 0 ? std::to_string(buffer_size) : "default") << std::endl;
 
-  private:
-    std::unique_ptr<std::thread> send_thread_;
+    return ss.str();
+  }
 };

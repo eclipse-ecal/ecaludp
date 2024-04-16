@@ -22,17 +22,21 @@
 #include <memory>
 #include <thread>
 
-class SenderSync : public Sender
+#include <ecaludp/socket.h>
+
+class SenderAsync : public Sender
 {
   public:
-    SenderSync(const SenderParameters& parameters);
-    ~SenderSync() override;
+    SenderAsync(const SenderParameters& parameters);
+    ~SenderAsync() override;
 
     void start() override;
 
   private:
-    void send_loop();
+    void send_message(const std::shared_ptr<const std::string>& message, const asio::ip::udp::endpoint& endpoint);
 
   private:
-    std::unique_ptr<std::thread> send_thread_;
+    std::unique_ptr<std::thread>     io_context_thread_;
+    asio::io_context                 io_context_;
+    std::shared_ptr<ecaludp::Socket> socket_;
 };

@@ -19,24 +19,46 @@
 #include <cstddef>
 #include <iostream>
 #include <string>
-
-#include <asio.hpp> // IWYU pragma: keep
 #include <thread>
 #include <vector>
 
-#include "sender_sync.h"
+#include <asio.hpp> // IWYU pragma: keep
+
+#include "receiver_async.h"
+#include "receiver_parameters.h"
 #include "receiver_sync.h"
+#include "sender_parameters.h"
+#include "sender_async.h"
+#include "sender_sync.h"
+
+enum class Implementation
+{
+  NONE,
+  SEND,
+  SENDASYNC,
+  RECEIVE,
+  RECEIVEASYNC,
+  RECEIVENPCAP,
+  RECEIVENPCAPASYNC
+};
 
 void printUsage(const std::string& arg0)
 {
   std::cout << "Usage:" << std::endl;
-  std::cout << "  " << arg0 << " send <ip>:<port>" << std::endl;
-  std::cout << "or:" << std::endl;
-  std::cout << "  " << arg0 << " receive <ip>:<port>" << std::endl;
+  std::cout << "  " << arg0 << " <IMPLEMENTATION> [PARAMETERS]" << std::endl;
+  std::cout << "With IMPLEMENTATION one of:" << std::endl;
+  std::cout << "  send                Asio-based sender using send_to in a while-loop" << std::endl;
+  std::cout << "  sendasync           Asio-based sender using async_send_to" << std::endl;
+  std::cout << "  receive             Asio-based receiver using receive_from in a while-loop" << std::endl;
+  std::cout << "  receiveasync        Asio-based receiver using async_receive_from" << std::endl;
+  std::cout << "  receivenpcap        Npcap-based receiver using receive_from in a while-loop" << std::endl;
+  std::cout << "  receivenpcapasync   Npcap-based receiver using async_receive_from" << std::endl;
   std::cout << std::endl;
   std::cout << "Options:" << std::endl;
   std::cout << "  -h, --help  Show this help message and exit" << std::endl;
   std::cout << std::endl;
+  std::cout << "      --ip <IP> IP address to send to / receive from" << std::endl;
+  std::cout << "      --port <PORT> Port to send to / receive from" << std::endl;
   std::cout << "  -s, --size <SIZE> Message size to send" << std::endl;
   std::cout << "  -m, --max-udp-datagram-size <SIZE> Maximum UDP datagram size" << std::endl;
   std::cout << "      --buffer-size <SIZE> Buffer size for sending & receiving messages" << std::endl;
@@ -45,15 +67,10 @@ void printUsage(const std::string& arg0)
 
 int main(int argc, char* argv[])
 {
-  bool sender_mode   = false;
-  bool receiver_mode = false;
+  Implementation implementation = Implementation::NONE;
 
-  size_t message_size          = 0;
-
-  // Default to max udp datagram size for IPv4
-  size_t max_udp_datagram_size = 65507;
-
-  int buffer_size = -1;
+  ReceiverParameters receiver_parameters;
+  SenderParameters   sender_parameters;
 
   // convert argc, argv to vector of strings
   std::vector<std::string> args;
@@ -72,6 +89,88 @@ int main(int argc, char* argv[])
     return 0;
   }
 
+  // Check for implementation
+  {
+    if (args[1] == "send")
+    {
+      implementation = Implementation::SEND;
+    }
+    else if (args[1] == "sendasync")
+    {
+      implementation = Implementation::SENDASYNC;
+    }
+    else if (args[1] == "receive")
+    {
+      implementation = Implementation::RECEIVE;
+    }
+    else if (args[1] == "receiveasync")
+    {
+      implementation = Implementation::RECEIVEASYNC;
+    }
+    else if (args[1] == "receivenpcap")
+    {
+      implementation = Implementation::RECEIVENPCAP;
+    }
+    else if (args[1] == "receivenpcapasync")
+    {
+      implementation = Implementation::RECEIVENPCAPASYNC;
+    }
+    else
+    {
+      printUsage(args[0]);
+      return 1;
+    }
+  }
+
+  // Check for --ip
+  {
+    auto it = std::find(args.begin(), args.end(), "--ip");
+    if (it != args.end())
+    {
+      if (it + 1 == args.end())
+      {
+        std::cerr << "Error: --ip requires an argument" << std::endl;
+        return 1;
+      }
+      sender_parameters.ip   = *(it + 1);
+      receiver_parameters.ip = *(it + 1);
+    }
+  }
+
+  // Check for --port
+  {
+    auto it = std::find(args.begin(), args.end(), "--port");
+    if (it != args.end())
+    {
+      if (it + 1 == args.end())
+      {
+        std::cerr << "Error: --port requires an argument" << std::endl;
+        return 1;
+      }
+
+      unsigned long port {0};
+      try
+      {
+        port = std::stoul(*(it + 1));
+      }
+      catch (const std::exception& e)
+      {
+        std::cerr << "Error: --port requires a numeric argument: " << e.what() << std::endl;
+        return 1;
+      }
+
+      // Check numeric limits and print error if out of range
+      if (port > std::numeric_limits<uint16_t>::max())
+      {
+        std::cerr << "Error: --port out of range" << std::endl;
+        return 1;
+      }
+
+      sender_parameters.port   = static_cast<uint16_t>(port);
+      receiver_parameters.port = static_cast<uint16_t>(port);
+    }
+  }
+
   // Check for -s / --size
   {
     auto it = std::find(args.begin(), args.end(), "-s");
@@ -87,7 +186,16 @@ int main(int argc, char* argv[])
         std::cerr << "Error: -s / --size requires an argument" << std::endl;
         return 1;
       }
-      message_size = std::stoul(*(it + 1));
+
+      try
+      {
+        sender_parameters.message_size = std::stoul(*(it + 1));
+      }
+      catch (const std::exception& e)
+      {
+        std::cerr << "Error: -s / --size requires a numeric argument: " << e.what() << std::endl;
+        return 1;
+      }
     }
   }
 
@@ -106,7 +214,16 @@ int main(int argc, char* argv[])
         std::cerr << "Error: -m / --max-udp-datagram-size requires an argument" << std::endl;
         return 1;
       }
-      max_udp_datagram_size = std::stoul(*(it + 1));
+
+      try
+      {
+        sender_parameters.max_udp_datagram_size = std::stoul(*(it + 1));
+      }
+      catch (const std::exception& e)
+      {
+        std::cerr << "Error: -m / --max-udp-datagram-size requires a numeric argument: " << e.what() << std::endl;
+        return 1;
+      }
     }
   }
 
@@ -120,43 +237,62 @@ int main(int argc, char* argv[])
         std::cerr << "Error: --buffer-size requires an argument" << std::endl;
         return 1;
       }
-      buffer_size = std::stoul(*(it + 1));
+
+      unsigned long buffer_size {0};
+      try
+      {
+          buffer_size = std::stoul(*(it + 1));
+      }
+      catch (const std::exception& e)
+      {
+          std::cerr << "Error: --buffer-size requires a numeric argument: " << e.what() << std::endl;
+          return 1;
+      }
+      sender_parameters.buffer_size   = buffer_size;
+      receiver_parameters.buffer_size = buffer_size;
     }
   }
 
-  // check for mode
-  if (args[1] == "send")
+
+  // Run the selected implementation
+  std::shared_ptr<Sender>   sender;
+  std::shared_ptr<Receiver> receiver;
+
+  switch (implementation)
   {
-    sender_mode = true;
-  }
-  else if (args[1] == "receive")
-  {
-    receiver_mode = true;
-  }
-  else
-  {
-    printUsage(args[0]);
-    return 1;
+  case Implementation::NONE:
+    break;
+  case Implementation::SEND:
+    sender = std::make_shared<SenderSync>(sender_parameters);
+    break;
+  case Implementation::SENDASYNC:
+    sender = std::make_shared<SenderAsync>(sender_parameters);
+    break;
+  case Implementation::RECEIVE:
+    receiver = std::make_shared<ReceiverSync>(receiver_parameters);
+    break;
+  case Implementation::RECEIVEASYNC:
+    receiver = std::make_shared<ReceiverAsync>(receiver_parameters);
+    break;
+  case Implementation::RECEIVENPCAP:
+    std::cerr << "Error: Implementation not yet implemented" << std::endl; return;
+    break;
+  case Implementation::RECEIVENPCAPASYNC:
+    std::cerr << "Error: Implementation not yet implemented" << std::endl; return;
+    break;
+  default:
+    break;
   }
 
-  if (sender_mode)
+  if (sender)
   {
-    SenderSync sender(message_size, max_udp_datagram_size, buffer_size);
-    sender.start();
-
-    while (true)
-    {
-      std::this_thread::sleep_for(std::chrono::seconds(1));
-    }
+    sender->start();
   }
-  else if (receiver_mode)
+  else if (receiver)
   {
-    ReceiverSync receiver(buffer_size);
-    receiver.start();
-
-    while (true)
-    {
-      std::this_thread::sleep_for(std::chrono::seconds(1));
-    }
+    receiver->start();
   }
+
+  while(true)
+    std::this_thread::sleep_for(std::chrono::seconds(1));
 }

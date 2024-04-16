@@ -15,18 +15,20 @@
  ********************************************************************************/
 
 #include "receiver_sync.h"
-#include "ecaludp/socket.h"
-#include "receiver.h"
 
 #include <iostream>
 #include <memory>
 #include <mutex>
-
-#include <asio.hpp>
 #include <thread>
 
-ReceiverSync::ReceiverSync(int buffer_size)
-  : Receiver(buffer_size)
+#include <asio.hpp>
+
+#include "ecaludp/socket.h"
+#include "receiver.h"
+#include "socket_builder_asio.h"
+
+ReceiverSync::ReceiverSync(const ReceiverParameters& parameters)
+  : Receiver(parameters)
 {
   std::cout << "Receiver implementation: Synchronous asio" << std::endl;
 }
@@ -48,48 +50,25 @@ void ReceiverSync::receive_loop()
 {
   asio::io_context io_context;
 
-  ecaludp::Socket         receive_socket(io_context, {'E', 'C', 'A', 'L'});
-  asio::ip::udp::endpoint destination(asio::ip::address_v4::loopback(), 14000);
-
+  std::shared_ptr<ecaludp::Socket> receive_socket;
+  try
   {
-    asio::error_code ec;
-    receive_socket.open(destination.protocol(), ec);
-    if (ec)
-    {
-      std::cerr << "Error opening socket: " << ec.message() << std::endl;
-      return;
-    }
+     receive_socket = SocketBuilderAsio::CreateReceiveSocket(io_context, parameters_);
+  }
+  catch (const std::exception& e)
+  {
+    std::cerr << "Error creating socket: " << e.what() << std::endl;
+    return; // TODO: Exit the app?
   }
 
-  {
-    asio::error_code ec;
-    receive_socket.bind(destination, ec);
-    if (ec)
-    {
-      std::cerr << "Error binding socket: " << ec.message() << std::endl;
-      return;
-    }
-  }
-
-  if (buffer_size_ > 0)
-  {
-    // Set receive buffer size
-    asio::socket_base::receive_buffer_size option(buffer_size_);
-    asio::error_code ec;
-    receive_socket.set_option(option, ec);
-    if (ec)
-    {
-      std::cerr << "Error setting receive buffer size: " << ec.message() << std::endl;
-      return;
-    }
-  }
+  asio::ip::udp::endpoint destination(asio::ip::address::from_string(parameters_.ip), parameters_.port);
 
   while (true)
   {
     {
 
       asio::error_code ec;
-      auto payload_buffer = receive_socket.receive_from(destination, 0, ec);
+      auto payload_buffer = receive_socket->receive_from(destination, 0, ec);
 
       if (ec)
       {
@@ -111,7 +90,7 @@ void ReceiverSync::receive_loop()
 
   {
     asio::error_code ec;
-    receive_socket.shutdown(asio::socket_base::shutdown_both, ec);
+    receive_socket->shutdown(asio::socket_base::shutdown_both, ec);
     if (ec)
     {
       std::cerr << "Error shutting down socket: " << ec.message() << std::endl;
@@ -120,7 +99,7 @@ void ReceiverSync::receive_loop()
 
   {
     asio::error_code ec;
-    receive_socket.close(ec);
+    receive_socket->close(ec);
     if (ec)
     {
       std::cerr << "Error closing socket: " << ec.message() << std::endl;
