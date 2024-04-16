@@ -275,10 +275,10 @@ int main(int argc, char* argv[])
     receiver = std::make_shared<ReceiverAsync>(receiver_parameters);
     break;
   case Implementation::RECEIVENPCAP:
-    std::cerr << "Error: Implementation not yet implemented" << std::endl; return;
+    std::cerr << "Error: Implementation not yet implemented" << std::endl; return 1;
     break;
   case Implementation::RECEIVENPCAPASYNC:
-    std::cerr << "Error: Implementation not yet implemented" << std::endl; return;
+    std::cerr << "Error: Implementation not yet implemented" << std::endl; return 1;
     break;
   default:
     break;
@@ -295,4 +295,6 @@ int main(int argc, char* argv[])
 
   while(true)
     std::this_thread::sleep_for(std::chrono::seconds(1));
+
+  return 0
 }
