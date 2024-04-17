@@ -55,7 +55,7 @@ namespace SocketBuilderNpcap
     asio::ip::udp::endpoint destination(ip_address, parameters.port);
 
     {
-      bool success = socket->bind(asio::ip::udp::endpoint(asio::ip::address_v4::loopback(), 14000));
+      bool success = socket->bind(destination);
       if (!success)
       {
         throw std::runtime_error("Failed to bind socket");
