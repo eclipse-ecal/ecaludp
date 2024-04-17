@@ -31,6 +31,13 @@
 #include "sender_async.h"
 #include "sender_sync.h"
 
+#if ECALUDP_UDPCAP_ENABLED
+  #include "receiver_npcap_sync.h"
+  #include "receiver_npcap_async.h"
+#endif // ECALUDP_UDPCAP_ENABLED
+
+#include "receiver_parameters.h"
+
 enum class Implementation
 {
   NONE,
@@ -275,10 +282,10 @@ int main(int argc, char* argv[])
     receiver = std::make_shared<ReceiverAsync>(receiver_parameters);
     break;
   case Implementation::RECEIVENPCAP:
-    std::cerr << "Error: Implementation not yet implemented" << std::endl; return 1;
+    receiver = std::make_shared<ReceiverNpcapSync>(receiver_parameters);
     break;
   case Implementation::RECEIVENPCAPASYNC:
-    std::cerr << "Error: Implementation not yet implemented" << std::endl; return 1;
+    receiver = std::make_shared<ReceiverNpcapAsync>(receiver_parameters);
     break;
   default:
     break;

@@ -40,6 +40,16 @@ set(sources
   src/socket_builder_asio.cpp
   src/socket_builder_asio.h
 )
+if (${ECALUDP_ENABLE_NPCAP})
+  list (APPEND sources
+	src/receiver_npcap_async.cpp
+	src/receiver_npcap_async.h
+	src/receiver_npcap_sync.cpp
+	src/receiver_npcap_sync.h
+    src/socket_builder_npcap.cpp
+    src/socket_builder_npcap.h
+  )
+endif()
 
 add_executable(${PROJECT_NAME} ${sources})
 
