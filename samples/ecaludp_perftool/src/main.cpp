@@ -282,11 +282,21 @@ int main(int argc, char* argv[])
     receiver = std::make_shared<ReceiverAsync>(receiver_parameters);
     break;
   case Implementation::RECEIVENPCAP:
+#if ECALUDP_UDPCAP_ENABLED
     receiver = std::make_shared<ReceiverNpcapSync>(receiver_parameters);
     break;
+#else
+    std::cerr << "Error: Npcap-based receiver not enabled" << std::endl;
+    return 1;
+#endif // ECALUDP_UDPCAP_ENABLED
   case Implementation::RECEIVENPCAPASYNC:
+#if ECALUDP_UDPCAP_ENABLED
     receiver = std::make_shared<ReceiverNpcapAsync>(receiver_parameters);
     break;
+#else
+    std::cerr << "Error: Npcap-based receiver not enabled" << std::endl;
+    return 1;
+#endif // ECALUDP_UDPCAP_ENABLED
   default:
     break;
   }
