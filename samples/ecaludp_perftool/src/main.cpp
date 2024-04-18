@@ -36,8 +36,6 @@
   #include "receiver_npcap_async.h"
 #endif // ECALUDP_UDPCAP_ENABLED
 
-#include "receiver_parameters.h"
-
 enum class Implementation
 {
   NONE,
