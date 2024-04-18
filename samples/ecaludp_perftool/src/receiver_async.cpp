@@ -75,10 +75,10 @@ void ReceiverAsync::start()
 
 void ReceiverAsync::receive_message()
 {
-  asio::ip::udp::endpoint endpoint;
+  auto endpoint = std::make_shared<asio::ip::udp::endpoint>();
 
-  socket_->async_receive_from(endpoint,
-                              [this](const std::shared_ptr<ecaludp::OwningBuffer>& message, const asio::error_code& ec)
+  socket_->async_receive_from(*endpoint,
+                              [this, endpoint](const std::shared_ptr<ecaludp::OwningBuffer>& message, const asio::error_code& ec)
                               {
                                 if (ec)
                                 {
