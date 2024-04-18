@@ -15,8 +15,15 @@
  ********************************************************************************/
 
 #include "socket_builder_asio.h"
+#include "ecaludp/socket.h"
+#include "receiver_parameters.h"
+#include "sender_parameters.h"
 
+#include <array>
 #include <memory>
+
+#include <asio.hpp>
+#include <stdexcept>
 
 namespace SocketBuilderAsio
 {

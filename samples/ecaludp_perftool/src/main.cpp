@@ -17,18 +17,24 @@
 #include <algorithm>
 #include <chrono>
 #include <cstddef>
+#include <cstdint>
+#include <exception>
 #include <iostream>
+#include <limits>
+#include <memory>
 #include <string>
 #include <thread>
 #include <vector>
 
 #include <asio.hpp> // IWYU pragma: keep
 
+#include "receiver.h"
 #include "receiver_async.h"
 #include "receiver_parameters.h"
 #include "receiver_sync.h"
-#include "sender_parameters.h"
+#include "sender.h"
 #include "sender_async.h"
+#include "sender_parameters.h"
 #include "sender_sync.h"
 
 #if ECALUDP_UDPCAP_ENABLED

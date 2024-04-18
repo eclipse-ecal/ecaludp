@@ -15,6 +15,7 @@
  ********************************************************************************/
 
 #include "receiver.h"
+#include "receiver_parameters.h"
 
 #include <chrono>
 #include <iomanip>
@@ -22,7 +23,6 @@
 #include <memory>
 #include <mutex>
 #include <sstream>
-#include <string>
 #include <thread>
 #include <utility>
 

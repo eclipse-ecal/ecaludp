@@ -16,6 +16,7 @@
 
 #include "receiver_async.h"
 
+#include <exception>
 #include <iostream>
 #include <memory>
 #include <mutex>
@@ -25,6 +26,7 @@
 
 #include "ecaludp/socket.h"
 #include "receiver.h"
+#include "receiver_parameters.h"
 #include "socket_builder_asio.h"
 
 ReceiverAsync::ReceiverAsync(const ReceiverParameters& parameters)

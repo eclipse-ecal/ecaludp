@@ -17,11 +17,8 @@
 #pragma once
 
 #include <condition_variable>
-#include <cstddef>
-#include <cstdint>
 #include <memory>
 #include <mutex>
-#include <string>
 #include <thread>
 
 #include "sender_parameters.h"

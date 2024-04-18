@@ -17,12 +17,15 @@
 #pragma once
 
 #include "sender.h"
+#include "sender_parameters.h"
 
-#include <cstddef>
 #include <memory>
+#include <string>
 #include <thread>
 
 #include <ecaludp/socket.h>
+
+#include <asio.hpp>
 
 class SenderAsync : public Sender
 {

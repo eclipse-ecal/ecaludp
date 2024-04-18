@@ -17,8 +17,8 @@
 #pragma once
 
 #include "sender.h"
+#include "sender_parameters.h"
 
-#include <cstddef>
 #include <memory>
 #include <thread>
 

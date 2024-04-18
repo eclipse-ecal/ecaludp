@@ -17,6 +17,7 @@
 #pragma once
 
 #include "receiver.h"
+#include "receiver_parameters.h"
 
 #include <memory>
 #include <thread>

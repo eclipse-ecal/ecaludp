@@ -16,7 +16,7 @@
 
 #include "sender_sync.h"
 
-#include <cstddef>
+#include <exception>
 #include <iostream>
 #include <memory>
 #include <mutex>

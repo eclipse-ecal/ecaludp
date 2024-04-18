@@ -16,7 +16,7 @@
 
 #include "sender_async.h"
 
-#include <cstddef>
+#include <exception>
 #include <iostream>
 #include <memory>
 #include <mutex>
@@ -25,7 +25,6 @@
 
 #include <asio.hpp>
 
-#include "ecaludp/socket.h"
 #include "sender.h"
 #include "sender_parameters.h"
 #include "socket_builder_asio.h"
