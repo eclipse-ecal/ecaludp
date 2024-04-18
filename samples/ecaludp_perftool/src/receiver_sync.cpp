@@ -32,7 +32,7 @@
 ReceiverSync::ReceiverSync(const ReceiverParameters& parameters)
   : Receiver(parameters)
 {
-  std::cout << "Receiver implementation: Synchronous asio" << std::endl;
+  std::cout << "Receiver implementation: Synchronous asio\n";
 }
 
 ReceiverSync::~ReceiverSync()
@@ -59,7 +59,7 @@ void ReceiverSync::receive_loop()
   }
   catch (const std::exception& e)
   {
-    std::cerr << "Error creating socket: " << e.what() << std::endl;
+    std::cerr << "Error creating socket: " << e.what() << '\n';
     return; // TODO: Exit the app?
   }
 
@@ -74,12 +74,12 @@ void ReceiverSync::receive_loop()
 
       if (ec)
       {
-        std::cerr << "Error receiving message: " << ec.message() << std::endl;
+        std::cerr << "Error receiving message: " << ec.message() << '\n';
         break;
       }
 
       {
-        std::unique_lock<std::mutex> lock(statistics_mutex_);
+        const std::lock_guard<std::mutex> lock(statistics_mutex_);
       
         if (is_stopped_)
           break;
@@ -92,19 +92,19 @@ void ReceiverSync::receive_loop()
 
   {
     asio::error_code ec;
-    receive_socket->shutdown(asio::socket_base::shutdown_both, ec);
+    receive_socket->shutdown(asio::socket_base::shutdown_both, ec); // NOLINT(bugprone-unused-return-value) The function also returns the error_code, but we already got it via the parameter
     if (ec)
     {
-      std::cerr << "Error shutting down socket: " << ec.message() << std::endl;
+      std::cerr << "Error shutting down socket: " << ec.message() << '\n';
     }
   }
 
   {
     asio::error_code ec;
-    receive_socket->close(ec);
+    receive_socket->close(ec); // NOLINT(bugprone-unused-return-value) The function also returns the error_code, but we already got it via the parameter
     if (ec)
     {
-      std::cerr << "Error closing socket: " << ec.message() << std::endl;
+      std::cerr << "Error closing socket: " << ec.message() << '\n';
     }
   }
 }

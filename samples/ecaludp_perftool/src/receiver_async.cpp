@@ -32,14 +32,18 @@
 ReceiverAsync::ReceiverAsync(const ReceiverParameters& parameters)
   : Receiver(parameters)
 {
-  std::cout << "Receiver implementation: Asynchronous asio" << std::endl;
+  std::cout << "Receiver implementation: Asynchronous asio\n";
 }
 
 ReceiverAsync::~ReceiverAsync()
 {
   if (socket_)
   {
-    socket_->cancel();
+    asio::error_code ec;
+    socket_->cancel(ec); // NOLINT(bugprone-unused-return-value) The function also returns the error_code, but we already got it via the parameter
+
+    if (ec)
+      std::cerr << "Error cancelling socket: " << ec.message() << '\n';
   }
 
   if(work_)
@@ -56,7 +60,7 @@ void ReceiverAsync::start()
   }
   catch (const std::exception& e)
   {
-    std::cerr << "Error creating socket: " << e.what() << std::endl;
+    std::cerr << "Error creating socket: " << e.what() << '\n';
     return; // TODO: Exit the app?
   }
 
@@ -78,13 +82,13 @@ void ReceiverAsync::receive_message()
                               {
                                 if (ec)
                                 {
-                                  std::cout << "Error sending: " << ec.message() << std::endl;
+                                  std::cout << "Error sending: " << ec.message() << '\n';
                                   socket_->close();
                                   return;
                                 }
 
                                 {
-                                  std::unique_lock<std::mutex> lock(statistics_mutex_);
+                                  const std::lock_guard<std::mutex> lock(statistics_mutex_);
 
                                   bytes_payload_     += message->size();
                                   messages_received_ ++;

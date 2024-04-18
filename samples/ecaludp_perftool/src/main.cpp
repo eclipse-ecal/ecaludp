@@ -55,25 +55,25 @@ enum class Implementation
 
 void printUsage(const std::string& arg0)
 {
-  std::cout << "Usage:" << std::endl;
-  std::cout << "  " << arg0 << " <IMPLEMENTATION> [PARAMETERS]" << std::endl;
-  std::cout << "With IMPLEMENTATION one of:" << std::endl;
-  std::cout << "  send                Asio-based sender using send_to in a while-loop" << std::endl;
-  std::cout << "  sendasync           Asio-based sender using async_send_to" << std::endl;
-  std::cout << "  receive             Asio-based receiver using receive_from in a while-loop" << std::endl;
-  std::cout << "  receiveasync        Asio-based receiver using async_receive_from" << std::endl;
-  std::cout << "  receivenpcap        Npcap-based receiver using receive_from in a while-loop" << std::endl;
-  std::cout << "  receivenpcapasync   Npcap-based receiver using async_receive_from" << std::endl;
-  std::cout << std::endl;
-  std::cout << "Options:" << std::endl;
-  std::cout << "  -h, --help  Show this help message and exit" << std::endl;
-  std::cout << std::endl;
-  std::cout << "      --ip <IP> IP address to send to / receive from" << std::endl;
-  std::cout << "      --port <PORT> Port to send to / receive from" << std::endl;
-  std::cout << "  -s, --size <SIZE> Message size to send" << std::endl;
-  std::cout << "  -m, --max-udp-datagram-size <SIZE> Maximum UDP datagram size" << std::endl;
-  std::cout << "      --buffer-size <SIZE> Buffer size for sending & receiving messages" << std::endl;
-  std::cout << std::endl;
+  std::cout << "Usage:\n";
+  std::cout << "  " << arg0 << " <IMPLEMENTATION> [PARAMETERS]\n";
+  std::cout << "With IMPLEMENTATION one of:\n";
+  std::cout << "  send                Asio-based sender using send_to in a while-loop\n";
+  std::cout << "  sendasync           Asio-based sender using async_send_to\n";
+  std::cout << "  receive             Asio-based receiver using receive_from in a while-loop\n";
+  std::cout << "  receiveasync        Asio-based receiver using async_receive_from\n";
+  std::cout << "  receivenpcap        Npcap-based receiver using receive_from in a while-loop\n";
+  std::cout << "  receivenpcapasync   Npcap-based receiver using async_receive_from\n";
+  std::cout << '\n';
+  std::cout << "Options:\n";
+  std::cout << "  -h, --help  Show this help message and exit\n";
+  std::cout << '\n';
+  std::cout << "      --ip <IP> IP address to send to / receive from\n";
+  std::cout << "      --port <PORT> Port to send to / receive from\n";
+  std::cout << "  -s, --size <SIZE> Message size to send\n";
+  std::cout << "  -m, --max-udp-datagram-size <SIZE> Maximum UDP datagram size\n";
+  std::cout << "      --buffer-size <SIZE> Buffer size for sending & receiving messages\n";
+  std::cout << '\n';
 }
 
 int main(int argc, char* argv[])
@@ -140,7 +140,7 @@ int main(int argc, char* argv[])
     {
       if (it + 1 == args.end())
       {
-        std::cerr << "Error: --ip requires an argument" << std::endl;
+        std::cerr << "Error: --ip requires an argument\n";
         return 1;
       }
       sender_parameters.ip   = *(it + 1);
@@ -155,7 +155,7 @@ int main(int argc, char* argv[])
     {
       if (it + 1 == args.end())
       {
-        std::cerr << "Error: --port requires an argument" << std::endl;
+        std::cerr << "Error: --port requires an argument\n";
         return 1;
       }
 
@@ -166,14 +166,14 @@ int main(int argc, char* argv[])
       }
       catch (const std::exception& e)
       {
-        std::cerr << "Error: --port requires a numeric argument: " << e.what() << std::endl;
+        std::cerr << "Error: --port requires a numeric argument: " << e.what() << '\n';
         return 1;
       }
 
       // Check numeric limits and print error if out of range
       if (port > std::numeric_limits<uint16_t>::max())
       {
-        std::cerr << "Error: --port out of range" << std::endl;
+        std::cerr << "Error: --port out of range\n";
         return 1;
       }
 
@@ -194,7 +194,7 @@ int main(int argc, char* argv[])
     {
       if (it + 1 == args.end())
       {
-        std::cerr << "Error: -s / --size requires an argument" << std::endl;
+        std::cerr << "Error: -s / --size requires an argument\n";
         return 1;
       }
 
@@ -204,7 +204,7 @@ int main(int argc, char* argv[])
       }
       catch (const std::exception& e)
       {
-        std::cerr << "Error: -s / --size requires a numeric argument: " << e.what() << std::endl;
+        std::cerr << "Error: -s / --size requires a numeric argument: " << e.what() << '\n';
         return 1;
       }
     }
@@ -222,7 +222,7 @@ int main(int argc, char* argv[])
     {
       if (it + 1 == args.end())
       {
-        std::cerr << "Error: -m / --max-udp-datagram-size requires an argument" << std::endl;
+        std::cerr << "Error: -m / --max-udp-datagram-size requires an argument\n";
         return 1;
       }
 
@@ -232,7 +232,7 @@ int main(int argc, char* argv[])
       }
       catch (const std::exception& e)
       {
-        std::cerr << "Error: -m / --max-udp-datagram-size requires a numeric argument: " << e.what() << std::endl;
+        std::cerr << "Error: -m / --max-udp-datagram-size requires a numeric argument: " << e.what() << '\n';
         return 1;
       }
     }
@@ -245,7 +245,7 @@ int main(int argc, char* argv[])
     {
       if (it + 1 == args.end())
       {
-        std::cerr << "Error: --buffer-size requires an argument" << std::endl;
+        std::cerr << "Error: --buffer-size requires an argument\n";
         return 1;
       }
 
@@ -256,7 +256,7 @@ int main(int argc, char* argv[])
       }
       catch (const std::exception& e)
       {
-          std::cerr << "Error: --buffer-size requires a numeric argument: " << e.what() << std::endl;
+          std::cerr << "Error: --buffer-size requires a numeric argument: " << e.what() << '\n';
           return 1;
       }
       sender_parameters.buffer_size   = buffer_size;
@@ -290,7 +290,7 @@ int main(int argc, char* argv[])
     receiver = std::make_shared<ReceiverNpcapSync>(receiver_parameters);
     break;
 #else
-    std::cerr << "Error: Npcap-based receiver not enabled" << std::endl;
+    std::cerr << "Error: Npcap-based receiver not enabled\n";
     return 1;
 #endif // ECALUDP_UDPCAP_ENABLED
   case Implementation::RECEIVENPCAPASYNC:
@@ -298,7 +298,7 @@ int main(int argc, char* argv[])
     receiver = std::make_shared<ReceiverNpcapAsync>(receiver_parameters);
     break;
 #else
-    std::cerr << "Error: Npcap-based receiver not enabled" << std::endl;
+    std::cerr << "Error: Npcap-based receiver not enabled\n";
     return 1;
 #endif // ECALUDP_UDPCAP_ENABLED
   default:

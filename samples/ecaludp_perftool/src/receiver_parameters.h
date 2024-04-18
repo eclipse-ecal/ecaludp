@@ -30,10 +30,10 @@ struct ReceiverParameters
   {
     std::stringstream ss;
 
-    ss << "Receiver Parameters: " << std::endl;
-    ss << "  IP:          " << ip << std::endl;
-    ss << "  Port:        " << port << std::endl;
-    ss << "  Buffer Size: " << (buffer_size > 0 ? std::to_string(buffer_size) : "default") << std::endl;
+    ss << "Receiver Parameters: \n";
+    ss << "  IP:          " << ip << '\n';
+    ss << "  Port:        " << port << '\n';
+    ss << "  Buffer Size: " << (buffer_size > 0 ? std::to_string(buffer_size) : "default") << '\n';
 
     return ss.str();
   }

@@ -41,7 +41,7 @@ namespace SocketBuilderAsio
       }
     }
 
-    asio::ip::udp::endpoint destination(ip_address, parameters.port);
+    const asio::ip::udp::endpoint destination(ip_address, parameters.port);
 
     if (parameters.max_udp_datagram_size > 0)
     {
@@ -50,7 +50,7 @@ namespace SocketBuilderAsio
 
     {
       asio::error_code ec;
-      socket->open(destination.protocol(), ec);
+      socket->open(destination.protocol(), ec); // NOLINT(bugprone-unused-return-value) The function also returns the error_code, but we already got it via the parameter
       if (ec)
       {
         throw std::runtime_error("Failed to open socket: " + ec.message());
@@ -60,10 +60,10 @@ namespace SocketBuilderAsio
     // Set sent buffer size
     if (parameters.buffer_size > 0)
     {
-      asio::socket_base::send_buffer_size option(parameters.buffer_size);
+      const asio::socket_base::send_buffer_size option(parameters.buffer_size);
 
       asio::error_code ec;
-      socket->set_option(option, ec);
+      socket->set_option(option, ec); // NOLINT(bugprone-unused-return-value) The function also returns the error_code, but we already got it via the parameter
       if (ec)
       {
         throw std::runtime_error("Failed to set send buffer size: " + ec.message());
@@ -87,11 +87,11 @@ namespace SocketBuilderAsio
       }
     }
 
-    asio::ip::udp::endpoint destination(ip_address, parameters.port);
+    const asio::ip::udp::endpoint destination(ip_address, parameters.port);
 
     {
       asio::error_code ec;
-      socket->open(destination.protocol(), ec);
+      socket->open(destination.protocol(), ec); // NOLINT(bugprone-unused-return-value) The function also returns the error_code, but we already got it via the parameter
       if (ec)
       {
         throw std::runtime_error("Failed to open socket: " + ec.message());
@@ -100,7 +100,7 @@ namespace SocketBuilderAsio
 
     {
       asio::error_code ec;
-      socket->bind(destination, ec);
+      socket->bind(destination, ec); // NOLINT(bugprone-unused-return-value) The function also returns the error_code, but we already got it via the parameter
       if (ec)
       {
         throw std::runtime_error("Failed to bind socket: " + ec.message());
@@ -110,10 +110,10 @@ namespace SocketBuilderAsio
     // Set receive buffer size
     if (parameters.buffer_size > 0)
     {
-      asio::socket_base::receive_buffer_size option(parameters.buffer_size);
+      const asio::socket_base::receive_buffer_size option(parameters.buffer_size);
 
       asio::error_code ec;
-      socket->set_option(option, ec);
+      socket->set_option(option, ec); // NOLINT(bugprone-unused-return-value) The function also returns the error_code, but we already got it via the parameter
       if (ec)
       {
         throw std::runtime_error("Failed to set receive buffer size: " + ec.message());
@@ -122,10 +122,10 @@ namespace SocketBuilderAsio
 
     // Set reuse address
     {
-      asio::socket_base::reuse_address option(true);
+      const asio::socket_base::reuse_address option(true);
 
       asio::error_code ec;
-      socket->set_option(option, ec);
+      socket->set_option(option, ec); // NOLINT(bugprone-unused-return-value) The function also returns the error_code, but we already got it via the parameter
       if (ec)
       {
         throw std::runtime_error("Failed to set reuse address: " + ec.message());

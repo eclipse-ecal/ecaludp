@@ -33,12 +33,12 @@ struct SenderParameters
   {
     std::stringstream ss;
 
-    ss << "SenderParameters: " << std::endl;
-    ss << "  ip:                    " << ip << std::endl;
-    ss << "  port:                  " << port << std::endl;
-    ss << "  message_size:          " << message_size << std::endl;
-    ss << "  max_udp_datagram_size: " << (max_udp_datagram_size > 0 ? std::to_string(max_udp_datagram_size) : "default") << std::endl;
-    ss << "  buffer_size:           " << (buffer_size > 0 ? std::to_string(buffer_size) : "default") << std::endl;
+    ss << "SenderParameters: \n";
+    ss << "  ip:                    " << ip << '\n';
+    ss << "  port:                  " << port << '\n';
+    ss << "  message_size:          " << message_size << '\n';
+    ss << "  max_udp_datagram_size: " << (max_udp_datagram_size > 0 ? std::to_string(max_udp_datagram_size) : "default") << '\n';
+    ss << "  buffer_size:           " << (buffer_size > 0 ? std::to_string(buffer_size) : "default") << '\n';
 
     return ss.str();
   }

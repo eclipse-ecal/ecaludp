@@ -32,14 +32,18 @@
 SenderAsync::SenderAsync(const SenderParameters& parameters)
   : Sender(parameters)
 {
-  std::cout << "Sender implementation: Asynchronous asio" << std::endl;
+  std::cout << "Sender implementation: Asynchronous asio\n";
 }
 
 SenderAsync::~SenderAsync()
 {
   if (socket_)
   {
-    socket_->cancel();
+    asio::error_code ec;
+    socket_->cancel(ec); // NOLINT(bugprone-unused-return-value) The function also returns the error_code, but we already got it via the parameter
+
+    if (ec)
+      std::cerr << "Error cancelling socket: " << ec.message() << '\n';
   }
 
   io_context_thread_->join();
@@ -53,7 +57,7 @@ void SenderAsync::start()
   }
   catch (const std::exception& e)
   {
-    std::cerr << "Error creating socket: " << e.what() << std::endl;
+    std::cerr << "Error creating socket: " << e.what() << '\n';
     return; // TODO: Exit the app?
   }
 
@@ -74,13 +78,13 @@ void SenderAsync::send_message(const std::shared_ptr<const std::string>& message
                           {
                             if (ec)
                             {
-                              std::cout << "Error sending: " << ec.message() << std::endl;
+                              std::cout << "Error sending: " << ec.message() << '\n';
                               socket_->close();
                               return;
                             }
 
                             {
-                              std::unique_lock<std::mutex> lock(statistics_mutex_);
+                              const std::lock_guard<std::mutex> lock(statistics_mutex_);
 
                               //bytes_raw_     += bytes_sent; // TODO: the current implementation doesn't return the raw number of bytes sent
                               bytes_payload_ += message->size();

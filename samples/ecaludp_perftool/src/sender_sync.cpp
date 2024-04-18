@@ -33,7 +33,7 @@
 SenderSync::SenderSync(const SenderParameters& parameters)
   : Sender(parameters)
 {
-  std::cout << "Sender implementation: Synchronous asio" << std::endl;
+  std::cout << "Sender implementation: Synchronous asio\n";
 }
 
 SenderSync::~SenderSync()
@@ -60,12 +60,12 @@ void SenderSync::send_loop()
   }
   catch (const std::exception& e)
   {
-    std::cerr << "Error creating socket: " << e.what() << std::endl;
+    std::cerr << "Error creating socket: " << e.what() << '\n';
     return; // TODO: Exit the app?
   }
 
-  std::string message = std::string(parameters_.message_size, 'a');
-  asio::ip::udp::endpoint destination(asio::ip::address::from_string(parameters_.ip), parameters_.port);
+  const std::string message = std::string(parameters_.message_size, 'a');
+  const asio::ip::udp::endpoint destination(asio::ip::address::from_string(parameters_.ip), parameters_.port);
 
   while (true)
   {
@@ -75,12 +75,12 @@ void SenderSync::send_loop()
 
       if (ec)
       {
-        std::cerr << "Error sending message: " << ec.message() << std::endl;
+        std::cerr << "Error sending message: " << ec.message() << '\n';
         break;
       }
 
       {
-        std::unique_lock<std::mutex> lock(statistics_mutex_);
+        const std::lock_guard<std::mutex> lock(statistics_mutex_);
       
         if (is_stopped_)
           break;
@@ -94,19 +94,19 @@ void SenderSync::send_loop()
 
   {
     asio::error_code ec;
-    send_socket->shutdown(asio::socket_base::shutdown_both, ec);
+    send_socket->shutdown(asio::socket_base::shutdown_both, ec); // NOLINT(bugprone-unused-return-value) The function also returns the error_code, but we already got it via the parameter
     if (ec)
     {
-      std::cerr << "Error shutting down socket: " << ec.message() << std::endl;
+      std::cerr << "Error shutting down socket: " << ec.message() << '\n';
     }
   }
 
   {
     asio::error_code ec;
-    send_socket->close(ec);
+    send_socket->close(ec); // NOLINT(bugprone-unused-return-value) The function also returns the error_code, but we already got it via the parameter
     if (ec)
     {
-      std::cerr << "Error closing socket: " << ec.message() << std::endl;
+      std::cerr << "Error closing socket: " << ec.message() << '\n';
     }
   }
 }

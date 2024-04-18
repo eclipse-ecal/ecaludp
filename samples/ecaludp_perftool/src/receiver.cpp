@@ -38,7 +38,7 @@ Receiver::~Receiver()
 {
   {
     // Stop statistics thread
-    std::lock_guard<std::mutex> lock(statistics_mutex_);
+    const std::lock_guard<std::mutex> lock(statistics_mutex_);
     is_stopped_ = true;
     cv_.notify_all();
   }
@@ -85,7 +85,7 @@ void Receiver::print_statistics()
       ss << " | ";
       ss << "freq: " << std::fixed << std::setprecision(1) << frequency;
 
-      std::cout << ss.str() << std::endl;
+      std::cout << ss.str() << '\n';
     }
 
     last_statistics_run = now;
