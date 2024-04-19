@@ -16,6 +16,7 @@
 
 #include "sender_sync.h"
 
+#include <cstdlib>
 #include <exception>
 #include <iostream>
 #include <memory>
@@ -61,7 +62,7 @@ void SenderSync::send_loop()
   catch (const std::exception& e)
   {
     std::cerr << "Error creating socket: " << e.what() << '\n';
-    return; // TODO: Exit the app?
+    std::exit(1);
   }
 
   const std::string message = std::string(parameters_.message_size, 'a');

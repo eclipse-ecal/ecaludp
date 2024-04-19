@@ -16,6 +16,7 @@
 
 #include "sender_async.h"
 
+#include <cstdlib>
 #include <exception>
 #include <iostream>
 #include <memory>
@@ -59,7 +60,7 @@ void SenderAsync::start()
   catch (const std::exception& e)
   {
     std::cerr << "Error creating socket: " << e.what() << '\n';
-    return; // TODO: Exit the app?
+    std::exit(1);
   }
 
   auto message = std::make_shared<std::string>(parameters_.message_size, 'a');
