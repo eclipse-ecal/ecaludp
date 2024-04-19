@@ -41,6 +41,12 @@ namespace SocketBuilderNpcap
       }
     }
 
+    // only v4 is supported right now
+    if (!ip_address.is_v4())
+    {
+      throw std::runtime_error("Only IPv4 is supported");
+    }
+
     // Set receive buffer size
     if (parameters.buffer_size > 0)
     {
@@ -51,9 +57,32 @@ namespace SocketBuilderNpcap
       }
     }
 
-    const asio::ip::udp::endpoint destination(ip_address, parameters.port);
 
+    if (ip_address.is_multicast())
     {
+      socket->set_multicast_loopback_enabled(true);
+
+      // "Bind" multicast address
+      {
+        const asio::ip::udp::endpoint bind_endpoint = asio::ip::udp::endpoint(asio::ip::address_v4(), parameters.port);
+        const bool success = socket->bind(bind_endpoint);
+        if (!success)
+        {
+          throw std::runtime_error("Failed to bind socket");
+        }
+      }
+
+      {
+        const bool success = socket->join_multicast_group(ip_address.to_v4());
+        if (!success)
+        {
+          throw std::runtime_error("Failed to join multicast group");
+        }
+      }
+    }
+    else
+    {
+      const asio::ip::udp::endpoint destination(ip_address, parameters.port);
       const bool success = socket->bind(destination);
       if (!success)
       {

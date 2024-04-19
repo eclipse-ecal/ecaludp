@@ -16,6 +16,8 @@
 
 #include "receiver_npcap_sync.h"
 
+#include <cstdlib>
+#include <exception>
 #include <iostream>
 #include <memory>
 #include <mutex>
@@ -25,6 +27,7 @@
 
 #include "ecaludp/socket_npcap.h"
 #include "receiver.h"
+#include "receiver_parameters.h"
 #include "socket_builder_npcap.h"
 
 ReceiverNpcapSync::ReceiverNpcapSync(const ReceiverParameters& parameters)
@@ -56,7 +59,7 @@ void ReceiverNpcapSync::receive_loop()
   catch (const std::exception& e)
   {
     std::cerr << "Error creating socket: " << e.what()<< '\n';
-    exit(1);
+    std::exit(1);
   }
 
   asio::ip::udp::endpoint destination(asio::ip::address::from_string(parameters_.ip), parameters_.port);

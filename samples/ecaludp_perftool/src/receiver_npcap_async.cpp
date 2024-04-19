@@ -16,15 +16,17 @@
 
 #include "receiver_npcap_async.h"
 
+#include <cstdlib>
+#include <exception>
 #include <iostream>
 #include <memory>
 #include <mutex>
-#include <thread>
 
 #include <asio.hpp>
 
 #include "ecaludp/socket.h"
 #include "receiver.h"
+#include "receiver_parameters.h"
 #include "socket_builder_npcap.h"
 
 ReceiverNpcapAsync::ReceiverNpcapAsync(const ReceiverParameters& parameters)
@@ -50,7 +52,7 @@ void ReceiverNpcapAsync::start()
   catch (const std::exception& e)
   {
     std::cerr << "Error creating socket: " << e.what()<< '\n';
-    exit(1);
+    std::exit(1);
   }
 
   receive_message();

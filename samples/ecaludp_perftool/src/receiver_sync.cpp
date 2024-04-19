@@ -16,6 +16,7 @@
 
 #include "receiver_sync.h"
 
+#include <cstdlib>
 #include <exception>
 #include <iostream>
 #include <memory>
@@ -60,7 +61,7 @@ void ReceiverSync::receive_loop()
   catch (const std::exception& e)
   {
     std::cerr << "Error creating socket: " << e.what() << '\n';
-    exit(1);
+    std::exit(1);
   }
 
   asio::ip::udp::endpoint destination;
