@@ -61,7 +61,7 @@ void ReceiverAsync::start()
   catch (const std::exception& e)
   {
     std::cerr << "Error creating socket: " << e.what() << '\n';
-    return; // TODO: Exit the app?
+    exit(1);
   }
 
   auto endpoint = asio::ip::udp::endpoint(asio::ip::make_address(parameters_.ip), parameters_.port);

@@ -68,11 +68,11 @@ void printUsage(const std::string& arg0)
   std::cout << "Options:\n";
   std::cout << "  -h, --help  Show this help message and exit\n";
   std::cout << '\n';
-  std::cout << "      --ip <IP> IP address to send to / receive from\n";
-  std::cout << "      --port <PORT> Port to send to / receive from\n";
-  std::cout << "  -s, --size <SIZE> Message size to send\n";
+  std::cout << "  -i, --ip <IP> IP address to send to / receive from. Default to 127.0.0.1\n";
+  std::cout << "  -p, --port <PORT> Port to send to / receive from. Default to 14000\n";
+  std::cout << "  -s, --size <SIZE> Message size to send. Default to 0 (-> empty messages)\n";
   std::cout << "  -m, --max-udp-datagram-size <SIZE> Maximum UDP datagram size\n";
-  std::cout << "      --buffer-size <SIZE> Buffer size for sending & receiving messages\n";
+  std::cout << "  -b, --buffer-size <SIZE> Buffer size for sending & receiving messages\n";
   std::cout << '\n';
 }
 
@@ -133,9 +133,14 @@ int main(int argc, char* argv[])
     }
   }
 
-  // Check for --ip
+  // Check for --ip / -i
   {
     auto it = std::find(args.begin(), args.end(), "--ip");
+    if (it == args.end())
+    {
+      it = std::find(args.begin(), args.end(), "-i");
+    }
+
     if (it != args.end())
     {
       if (it + 1 == args.end())
@@ -148,9 +153,13 @@ int main(int argc, char* argv[])
     }
   }
 
-  // Check for --port
+  // Check for --port / -p
   {
     auto it = std::find(args.begin(), args.end(), "--port");
+    if (it == args.end())
+    {
+      it = std::find(args.begin(), args.end(), "-p");
+    }
     if (it != args.end())
     {
       if (it + 1 == args.end())
@@ -238,9 +247,13 @@ int main(int argc, char* argv[])
     }
   }
 
-  // Check for buffer size
+  // Check for -b / --buffer-size
   {
     auto it = std::find(args.begin(), args.end(), "--buffer-size");
+    if (it == args.end())
+    {
+      it = std::find(args.begin(), args.end(), "-b");
+    }
     if (it != args.end())
     {
       if (it + 1 == args.end())

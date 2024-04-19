@@ -56,7 +56,7 @@ void ReceiverNpcapSync::receive_loop()
   catch (const std::exception& e)
   {
     std::cerr << "Error creating socket: " << e.what() << std::endl;
-    return; // TODO: Exit the app?
+    exit(1);
   }
 
   asio::ip::udp::endpoint destination(asio::ip::address::from_string(parameters_.ip), parameters_.port);

@@ -50,7 +50,7 @@ void ReceiverNpcapAsync::start()
   catch (const std::exception& e)
   {
     std::cerr << "Error creating socket: " << e.what() << std::endl;
-    return; // TODO: Exit the app?
+    exit(1);
   }
 
   receive_message();
