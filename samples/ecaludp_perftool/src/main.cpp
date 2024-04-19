@@ -57,6 +57,7 @@ void printUsage(const std::string& arg0)
 {
   std::cout << "Usage:\n";
   std::cout << "  " << arg0 << " <IMPLEMENTATION> [PARAMETERS]\n";
+  std::cout << '\n';
   std::cout << "With IMPLEMENTATION one of:\n";
   std::cout << "  send                Asio-based sender using send_to in a while-loop\n";
   std::cout << "  sendasync           Asio-based sender using async_send_to\n";

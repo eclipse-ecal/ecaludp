@@ -63,12 +63,11 @@ void ReceiverSync::receive_loop()
     exit(1);
   }
 
-  asio::ip::udp::endpoint destination(asio::ip::address::from_string(parameters_.ip), parameters_.port);
+  asio::ip::udp::endpoint destination;
 
   while (true)
   {
     {
-
       asio::error_code ec;
       auto payload_buffer = receive_socket->receive_from(destination, 0, ec);
 
