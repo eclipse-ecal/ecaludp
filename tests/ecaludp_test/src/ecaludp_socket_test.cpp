@@ -368,7 +368,7 @@ TEST(EcalUdpSocket, SyncHelloWorldMessage)
     asio::error_code ec;
     send_socket.send_to(asio::buffer(message_to_send), destination, 0, ec);
     if (ec)
-      std::cerr << ec.message() << std::endl;
+      std::cerr << ec.message() << '\n';
     ASSERT_FALSE(ec);
   }
 
@@ -460,7 +460,7 @@ TEST(EcalUdpSocket, SyncBigMessage)
     asio::error_code ec;
     send_socket.send_to(asio::buffer(message_to_send), destination, 0, ec);
     if (ec)
-      std::cerr << ec.message() << std::endl;
+      std::cerr << ec.message() << '\n';
     ASSERT_FALSE(ec);
   }
 

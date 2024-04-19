@@ -124,14 +124,14 @@ namespace SocketBuilderAsio
       }
       {
         // "Bind" multicast address
-        const asio::ip::udp::endpoint bind_endpoint;
+        asio::ip::udp::endpoint bind_endpoint;
         if (ip_address.is_v4())
         {
-          asio::ip::udp::endpoint bind_endpoint(asio::ip::address_v4(), destination.port());
+          bind_endpoint = asio::ip::udp::endpoint(asio::ip::address_v4(), destination.port());
         }
         else
         {
-          asio::ip::udp::endpoint bind_endpoint(asio::ip::address_v6(), destination.port());
+          bind_endpoint = asio::ip::udp::endpoint(asio::ip::address_v6(), destination.port());
         }
 
         asio::error_code ec;
