@@ -30,7 +30,7 @@
 ReceiverNpcapAsync::ReceiverNpcapAsync(const ReceiverParameters& parameters)
   : Receiver(parameters)
 {
-  std::cout << "Receiver implementation: Asynchronous NPCAP" << std::endl;
+  std::cout << "Receiver implementation: Asynchronous NPCAP\n";
 }
 
 ReceiverNpcapAsync::~ReceiverNpcapAsync()
@@ -49,7 +49,7 @@ void ReceiverNpcapAsync::start()
   }
   catch (const std::exception& e)
   {
-    std::cerr << "Error creating socket: " << e.what() << std::endl;
+    std::cerr << "Error creating socket: " << e.what()<< '\n';
     exit(1);
   }
 
@@ -61,17 +61,17 @@ void ReceiverNpcapAsync::receive_message()
   auto endpoint = std::make_shared<asio::ip::udp::endpoint>();
 
   socket_->async_receive_from(*endpoint,
-                              [this, endpoint](const std::shared_ptr<ecaludp::OwningBuffer>& message, ecaludp::Error& error)
+                              [this, endpoint](const std::shared_ptr<ecaludp::OwningBuffer>& message, const ecaludp::Error& error)
                               {
                                 if (error)
                                 {
-                                  std::cout << "Error sending: " << error.ToString() << std::endl;
+                                  std::cerr << "Error sending: " << error.ToString()<< '\n';
                                   socket_->close();
                                   return;
                                 }
 
                                 {
-                                  std::unique_lock<std::mutex> lock(statistics_mutex_);
+                                  const std::lock_guard<std::mutex> lock(statistics_mutex_);
 
                                   bytes_payload_     += message->size();
                                   messages_received_ ++;

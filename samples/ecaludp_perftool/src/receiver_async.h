@@ -32,6 +32,12 @@ class ReceiverAsync : public Receiver
     ReceiverAsync(const ReceiverParameters& parameters);
     ~ReceiverAsync() override;
 
+    // disable copy and move
+    ReceiverAsync(const ReceiverAsync&) = delete;
+    ReceiverAsync(ReceiverAsync&&) = delete;
+    ReceiverAsync& operator=(const ReceiverAsync&) = delete;
+    ReceiverAsync& operator=(ReceiverAsync&&) = delete;
+
     void start() override;
 
   private:

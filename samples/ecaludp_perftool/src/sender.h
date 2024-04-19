@@ -29,6 +29,12 @@ public:
   Sender(const SenderParameters& parameters);
   virtual ~Sender();
 
+  // disable copy and move
+  Sender(const Sender&) = delete;
+  Sender(Sender&&) = delete;
+  Sender& operator=(const Sender&) = delete;
+  Sender& operator=(Sender&&) = delete;
+
   virtual void start() = 0;
 
 private:

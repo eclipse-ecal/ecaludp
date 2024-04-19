@@ -72,7 +72,7 @@ namespace ecaludp
                                           , size_t               max_buffer_size
                                           , Udpcap::HostAddress& sender_address
                                           , uint16_t&            sender_port
-                                          , const std::function<void(ecaludp::Error&, size_t)>& read_handler)
+                                          , const std::function<void(const ecaludp::Error&, size_t)>& read_handler)
   {
     const std::unique_lock<std::mutex> lock(wait_thread_trigger_mutex_);
     async_receive_from_parameters_queue_.push_back({ buffer, max_buffer_size, &sender_address, &sender_port, read_handler });

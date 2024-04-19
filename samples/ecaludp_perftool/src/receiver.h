@@ -29,6 +29,12 @@ public:
   Receiver(const ReceiverParameters& parameters);
   virtual ~Receiver();
 
+  // disable copy and move
+  Receiver(const Receiver&) = delete;
+  Receiver(Receiver&&) = delete;
+  Receiver& operator=(const Receiver&) = delete;
+  Receiver& operator=(Receiver&&) = delete;
+  
   virtual void start() = 0;
 
 private:

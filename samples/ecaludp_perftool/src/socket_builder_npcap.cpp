@@ -44,18 +44,17 @@ namespace SocketBuilderNpcap
     // Set receive buffer size
     if (parameters.buffer_size > 0)
     {
-      asio::socket_base::receive_buffer_size option(parameters.buffer_size);
-      bool success = socket->set_receive_buffer_size(parameters.buffer_size);
+      const bool success = socket->set_receive_buffer_size(parameters.buffer_size);
       if (!success)
       {
         throw std::runtime_error("Failed to set receive buffer size");
       }
     }
 
-    asio::ip::udp::endpoint destination(ip_address, parameters.port);
+    const asio::ip::udp::endpoint destination(ip_address, parameters.port);
 
     {
-      bool success = socket->bind(destination);
+      const bool success = socket->bind(destination);
       if (!success)
       {
         throw std::runtime_error("Failed to bind socket");

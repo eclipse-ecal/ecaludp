@@ -28,6 +28,12 @@ class SenderSync : public Sender
     SenderSync(const SenderParameters& parameters);
     ~SenderSync() override;
 
+    // disable copy and move
+    SenderSync(const SenderSync&) = delete;
+    SenderSync(SenderSync&&) = delete;
+    SenderSync& operator=(const SenderSync&) = delete;
+    SenderSync& operator=(SenderSync&&) = delete;
+
     void start() override;
 
   private:

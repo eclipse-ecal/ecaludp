@@ -46,7 +46,8 @@ SenderAsync::~SenderAsync()
       std::cerr << "Error cancelling socket: " << ec.message() << '\n';
   }
 
-  io_context_thread_->join();
+  if(io_context_thread_->joinable())
+    io_context_thread_->join();
 }
 
 void SenderAsync::start() 
@@ -78,7 +79,7 @@ void SenderAsync::send_message(const std::shared_ptr<const std::string>& message
                           {
                             if (ec)
                             {
-                              std::cout << "Error sending: " << ec.message() << '\n';
+                              std::cerr << "Error sending: " << ec.message() << '\n';
                               socket_->close();
                               return;
                             }

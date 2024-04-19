@@ -27,6 +27,12 @@ class ReceiverNpcapSync : public Receiver
     ReceiverNpcapSync(const ReceiverParameters& parameters);
     ~ReceiverNpcapSync() override;
 
+    // disable copy and move
+    ReceiverNpcapSync(const ReceiverNpcapSync&) = delete;
+    ReceiverNpcapSync(ReceiverNpcapSync&&) = delete;
+    ReceiverNpcapSync& operator=(const ReceiverNpcapSync&) = delete;
+    ReceiverNpcapSync& operator=(ReceiverNpcapSync&&) = delete;
+
     void start() override;
 
   private:

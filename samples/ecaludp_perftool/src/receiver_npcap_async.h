@@ -31,6 +31,12 @@ class ReceiverNpcapAsync : public Receiver
     ReceiverNpcapAsync(const ReceiverParameters& parameters);
     ~ReceiverNpcapAsync() override;
 
+    // disable copy and move
+    ReceiverNpcapAsync(const ReceiverNpcapAsync&) = delete;
+    ReceiverNpcapAsync(ReceiverNpcapAsync&&) = delete;
+    ReceiverNpcapAsync& operator=(const ReceiverNpcapAsync&) = delete;
+    ReceiverNpcapAsync& operator=(ReceiverNpcapAsync&&) = delete;
+
     void start() override;
 
   private:

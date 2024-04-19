@@ -67,7 +67,7 @@ void receive_package()
   auto sender_endpoint = std::make_shared<asio::ip::udp::endpoint>();
 
   receive_socket_->async_receive_from(*sender_endpoint
-                              , [sender_endpoint](const std::shared_ptr<ecaludp::OwningBuffer>& buffer, ecaludp::Error& error)
+                              , [sender_endpoint](const std::shared_ptr<ecaludp::OwningBuffer>& buffer, const ecaludp::Error& error)
                                 {
                                   if (error)
                                   {

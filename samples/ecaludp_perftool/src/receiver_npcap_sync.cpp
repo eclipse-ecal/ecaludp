@@ -30,7 +30,7 @@
 ReceiverNpcapSync::ReceiverNpcapSync(const ReceiverParameters& parameters)
   : Receiver(parameters)
 {
-  std::cout << "Receiver implementation: Synchronous NPCAP" << std::endl;
+  std::cout << "Receiver implementation: Synchronous NPCAP\n";
 }
 
 ReceiverNpcapSync::~ReceiverNpcapSync()
@@ -55,7 +55,7 @@ void ReceiverNpcapSync::receive_loop()
   }
   catch (const std::exception& e)
   {
-    std::cerr << "Error creating socket: " << e.what() << std::endl;
+    std::cerr << "Error creating socket: " << e.what()<< '\n';
     exit(1);
   }
 
@@ -69,12 +69,12 @@ void ReceiverNpcapSync::receive_loop()
 
       if (error)
       {
-        std::cerr << "Error receiving message: " << error.ToString() << std::endl;
+        std::cerr << "Error receiving message: " << error.ToString()<< '\n';
         break;
       }
 
       {
-        std::unique_lock<std::mutex> lock(statistics_mutex_);
+        const std::lock_guard<std::mutex> lock(statistics_mutex_);
       
         if (is_stopped_)
           break;

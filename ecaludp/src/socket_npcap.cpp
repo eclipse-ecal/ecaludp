@@ -141,13 +141,13 @@ namespace ecaludp
   
   
   void SocketNpcap::async_receive_from(asio::ip::udp::endpoint& sender_endpoint
-                                      , const std::function<void(const std::shared_ptr<ecaludp::OwningBuffer>&, ecaludp::Error)>& completion_handler)
+                                      , const std::function<void(const std::shared_ptr<ecaludp::OwningBuffer>&, const ecaludp::Error&)>& completion_handler)
   {
     receive_next_datagram_from(sender_endpoint, completion_handler);
   }
 
   void SocketNpcap::receive_next_datagram_from(asio::ip::udp::endpoint& sender_endpoint
-                                              , const std::function<void(const std::shared_ptr<ecaludp::OwningBuffer>&, ecaludp::Error)>& completion_handler)
+                                              , const std::function<void(const std::shared_ptr<ecaludp::OwningBuffer>&, const ecaludp::Error&)>& completion_handler)
 
   {
     auto datagram_buffer = datagram_buffer_pool_->allocate();
@@ -164,7 +164,7 @@ namespace ecaludp
                             , buffer->size()
                             , *sender_address
                             , *sender_port
-                            , [this, buffer, completion_handler, sender_address, sender_port, &sender_endpoint](ecaludp::Error& error, size_t bytes_received)
+                            , [this, buffer, completion_handler, sender_address, sender_port, &sender_endpoint](const ecaludp::Error& error, size_t bytes_received)
                               {
                                 if (error)
                                 {

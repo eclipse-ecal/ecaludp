@@ -33,6 +33,12 @@ class SenderAsync : public Sender
     SenderAsync(const SenderParameters& parameters);
     ~SenderAsync() override;
 
+    // disable copy and move
+    SenderAsync(const SenderAsync&) = delete;
+    SenderAsync(SenderAsync&&) = delete;
+    SenderAsync& operator=(const SenderAsync&) = delete;
+    SenderAsync& operator=(SenderAsync&&) = delete;
+
     void start() override;
 
   private:

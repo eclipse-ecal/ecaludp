@@ -28,6 +28,12 @@ class ReceiverSync : public Receiver
     ReceiverSync(const ReceiverParameters& parameters);
     ~ReceiverSync() override;
 
+    // disable copy and move
+    ReceiverSync(const ReceiverSync&) = delete;
+    ReceiverSync(ReceiverSync&&) = delete;
+    ReceiverSync& operator=(const ReceiverSync&) = delete;
+    ReceiverSync& operator=(ReceiverSync&&) = delete;
+
     void start() override;
 
   private:

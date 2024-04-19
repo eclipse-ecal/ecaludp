@@ -49,7 +49,8 @@ ReceiverAsync::~ReceiverAsync()
   if(work_)
     work_.reset();
 
-  io_context_thread_->join();
+  if (io_context_thread_->joinable())
+    io_context_thread_->join();
 }
 
 void ReceiverAsync::start()
@@ -82,7 +83,7 @@ void ReceiverAsync::receive_message()
                               {
                                 if (ec)
                                 {
-                                  std::cout << "Error sending: " << ec.message() << '\n';
+                                  std::cerr << "Error sending: " << ec.message() << '\n';
                                   socket_->close();
                                   return;
                                 }

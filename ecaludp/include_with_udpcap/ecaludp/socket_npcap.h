@@ -90,12 +90,11 @@ namespace ecaludp
     ECALUDP_EXPORT std::shared_ptr<ecaludp::OwningBuffer> receive_from(asio::ip::udp::endpoint& sender_endpoint, ecaludp::Error& error);
 
     ECALUDP_EXPORT void async_receive_from(asio::ip::udp::endpoint& sender_endpoint
-                                  , const std::function<void(const std::shared_ptr<ecaludp::OwningBuffer>&, ecaludp::Error)>& completion_handler);
-
+                                  , const std::function<void(const std::shared_ptr<ecaludp::OwningBuffer>&, const ecaludp::Error&)>& completion_handler);
 
   private:
     void receive_next_datagram_from(asio::ip::udp::endpoint& sender_endpoint
-                                  , const std::function<void(const std::shared_ptr<ecaludp::OwningBuffer>&, ecaludp::Error)>& completion_handler);
+                                  , const std::function<void(const std::shared_ptr<ecaludp::OwningBuffer>&, const ecaludp::Error&)>& completion_handler);
 
     std::shared_ptr<ecaludp::OwningBuffer> handle_datagram(const std::shared_ptr<ecaludp::RawMemory>&     buffer
                                                         , const std::shared_ptr<asio::ip::udp::endpoint>& sender_endpoint
