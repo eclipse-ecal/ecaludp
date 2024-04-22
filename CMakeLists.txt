@@ -96,6 +96,7 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/ecaludp-module)
 # Add samples, if enabled
 if (ECALUDP_BUILD_SAMPLES)
     add_subdirectory(samples/ecaludp_sample)
+    add_subdirectory(samples/ecaludp_perftool)
     if (ECALUDP_ENABLE_NPCAP)
         add_subdirectory(samples/ecaludp_sample_npcap)
     endif()

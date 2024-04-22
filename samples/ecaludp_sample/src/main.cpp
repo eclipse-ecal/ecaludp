@@ -43,7 +43,7 @@ void send_package()
                           {
                             if (ec)
                             {
-                              std::cout << "Error sending: " << ec.message() << std::endl;
+                              std::cout << "Error sending: " << ec.message() << '\n';
                               return;
                             }
 
@@ -52,7 +52,7 @@ void send_package()
                                                     {
                                                       if (ec)
                                                       {
-                                                        std::cout << "Error waiting: " << ec.message() << std::endl;
+                                                        std::cout << "Error waiting: " << ec.message() << '\n';
                                                         return;
                                                       }
 
@@ -70,12 +70,12 @@ void receive_package()
                                 {
                                   if (ec)
                                   {
-                                    std::cout << "Error receiving: " << ec.message() << std::endl;
+                                    std::cout << "Error receiving: " << ec.message() << '\n';
                                     return;
                                   }
 
                                   std::string received_string(static_cast<const char*>(buffer->data()), buffer->size());
-                                  std::cout << "Received " << buffer->size() << " bytes from " << sender_endpoint->address().to_string() << ":" << sender_endpoint->port() << ": " << received_string << std::endl;
+                                  std::cout << "Received " << buffer->size() << " bytes from " << sender_endpoint->address().to_string() << ":" << sender_endpoint->port() << ": " << received_string << '\n';
 
 
                                   receive_package();
@@ -96,7 +96,7 @@ int main(int argc, char** argv)
 
     if (ec)
     {
-      std::cout << "Error opening socket: " << ec.message() << std::endl;
+      std::cout << "Error opening socket: " << ec.message() << '\n';
       return -1;
     }
   }
@@ -107,7 +107,7 @@ int main(int argc, char** argv)
 
     if (ec)
     {
-      std::cout << "Error binding socket: " << ec.message() << std::endl;
+      std::cout << "Error binding socket: " << ec.message() << '\n';
       return -1;
     }
   }

@@ -1,0 +1,7 @@
+---
+# This disables the warning of non-private members. We use those for inheritance here (with protected visibility).
+
+Checks: "-cppcoreguidelines-non-private-member-variables-in-classes,
+"
+
+InheritParentConfig: true
