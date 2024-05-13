@@ -246,8 +246,15 @@ configure_package_config_file(
   INSTALL_DESTINATION ${ECALUDP_INSTALL_CMAKE_DIR}
   PATH_VARS ECALUDP_INSTALL_CMAKE_DIR
 )
+write_basic_package_version_file(
+  "${CMAKE_CURRENT_BINARY_DIR}/cmake_/ecaludpConfigVersion.cmake"
+  VERSION ${PROJECT_VERSION}
+  COMPATIBILITY SameMajorVersion
+)
 install(
-  FILES "${CMAKE_CURRENT_BINARY_DIR}/cmake_/ecaludpConfig.cmake"
+  FILES
+    "${CMAKE_CURRENT_BINARY_DIR}/cmake_/ecaludpConfig.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/cmake_/ecaludpConfigVersion.cmake"
   DESTINATION ${ECALUDP_INSTALL_CMAKE_DIR}
   COMPONENT ecaludp_dev
 )
