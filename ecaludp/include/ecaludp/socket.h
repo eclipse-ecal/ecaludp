@@ -46,7 +46,7 @@ namespace ecaludp
   // Constructor
   /////////////////////////////////////////////////////////////////
   public:
-    ECALUDP_EXPORT Socket(asio::io_service& io_service, std::array<char, 4> magic_header_bytes);
+    ECALUDP_EXPORT Socket(asio::io_context& io_context, std::array<char, 4> magic_header_bytes);
 
     // Destructor
     ECALUDP_EXPORT ~Socket();

@@ -40,7 +40,7 @@ int main()
     socket.bind(asio::ip::udp::endpoint(asio::ip::address_v4::loopback(), 14000), ec);
   }
 
-  auto work = std::make_unique<asio::io_context::work>(io_context);
+  auto work = asio::make_work_guard(io_context);
   std::thread io_thread([&io_context]() { io_context.run(); });
 
   std::shared_ptr<asio::ip::udp::endpoint> sender_endpoint = std::make_shared<asio::ip::udp::endpoint>();

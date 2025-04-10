@@ -47,7 +47,7 @@ void send_package()
                               return;
                             }
 
-                            send_timer_->expires_from_now(std::chrono::milliseconds(500));
+                            send_timer_->expires_after(std::chrono::milliseconds(500));
                             send_timer_->async_wait([](asio::error_code ec)
                                                     {
                                                       if (ec)
@@ -114,7 +114,7 @@ int main(int argc, char** argv)
 
   send_timer_ = std::make_shared<asio::steady_timer>(*io_context_);
 
-  asio::io_context::work work(*io_context_);
+  auto work = asio::make_work_guard(*io_context_);
 
   receive_package();
   send_package();

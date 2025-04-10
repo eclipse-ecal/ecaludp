@@ -47,5 +47,6 @@ class ReceiverAsync : public Receiver
     std::unique_ptr<std::thread>            io_context_thread_;
     asio::io_context                        io_context_;
     std::shared_ptr<ecaludp::Socket>        socket_;
-    std::unique_ptr<asio::io_context::work> work_;
+    using work_guard_t = asio::executor_work_guard<asio::io_context::executor_type>;
+    std::unique_ptr<work_guard_t> work_;
 };
