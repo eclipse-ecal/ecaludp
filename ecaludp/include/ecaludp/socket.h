@@ -70,16 +70,16 @@ namespace ecaludp
     std::size_t available(asio::error_code& ec) const                                            { return socket_.available(ec); }
 
     void bind(const asio::ip::udp::endpoint& endpoint)                                           { socket_.bind(endpoint); }
-    asio::error_code bind(const asio::ip::udp::endpoint& endpoint, asio::error_code& ec)         { return socket_.bind(endpoint, ec); }
+    asio::error_code bind(const asio::ip::udp::endpoint& endpoint, asio::error_code& ec)         { socket_.bind(endpoint, ec); return ec; }
 
     void cancel()                                                                                { socket_.cancel(); }
-    asio::error_code cancel(asio::error_code& ec)                                                { return socket_.cancel(ec); }
+    asio::error_code cancel(asio::error_code& ec)                                                { socket_.cancel(ec); return ec;}
 
     void close()                                                                                 { socket_.close(); }
-    asio::error_code close(asio::error_code& ec)                                                 { return socket_.close(ec); }
+    asio::error_code close(asio::error_code& ec)                                                 { socket_.close(ec); return ec; }
 
     void connect(const asio::ip::udp::endpoint& peer_endpoint)                                   { socket_.connect(peer_endpoint); }
-    asio::error_code connect(const asio::ip::udp::endpoint& peer_endpoint, asio::error_code& ec) { return socket_.connect(peer_endpoint, ec); }
+    asio::error_code connect(const asio::ip::udp::endpoint& peer_endpoint, asio::error_code& ec) { socket_.connect(peer_endpoint, ec); return ec; }
 
     const asio::any_io_executor& get_executor()                                                  { return socket_.get_executor(); }
 
@@ -110,7 +110,7 @@ namespace ecaludp
     ASIO_SYNC_OP_VOID native_non_blocking(bool mode, asio::error_code& ec)                       { ASIO_SYNC_OP_VOID_RETURN(socket_.native_non_blocking(mode, ec)); }
 
     void open(const asio::ip::udp& protocol)                                                     { socket_.open(protocol); }
-    asio::error_code open(const asio::ip::udp& protocol, asio::error_code& ec)                   { return socket_.open(protocol, ec); }
+    asio::error_code open(const asio::ip::udp& protocol, asio::error_code& ec)                   { socket_.open(protocol, ec); return ec;}
 
     asio::ip::udp::endpoint remote_endpoint()                     const                          { return socket_.remote_endpoint(); }
     asio::ip::udp::endpoint remote_endpoint(asio::error_code& ec) const                          { return socket_.remote_endpoint(ec); }
@@ -119,10 +119,10 @@ namespace ecaludp
     void set_option(const SettableSocketOption& option)                                          { socket_.set_option(option); }
 
     template<typename SettableSocketOption>
-    asio::error_code set_option(const SettableSocketOption& option, asio::error_code& ec)        { return socket_.set_option(option, ec); }
+    asio::error_code set_option(const SettableSocketOption& option, asio::error_code& ec)        { socket_.set_option(option, ec); return ec;}
 
     void shutdown(asio::socket_base::shutdown_type what)                                         { socket_.shutdown(what); }
-    asio::error_code shutdown(asio::socket_base::shutdown_type what, asio::error_code& ec)       { return socket_.shutdown(what, ec); }
+    asio::error_code shutdown(asio::socket_base::shutdown_type what, asio::error_code& ec)       { socket_.shutdown(what, ec); return ec; }
 
 
   /////////////////////////////////////////////////////////////////
