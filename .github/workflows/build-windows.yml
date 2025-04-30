@@ -9,8 +9,8 @@ env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   INSTALL_PREFIX: _install
   PROJECT_NAME:   ecaludp
-  VS_TOOLSET:     v140
-  VS_NAME:        vs2015
+  VS_TOOLSET:     v141
+  VS_NAME:        vs2017
 
 jobs:
   build-windows:
@@ -82,6 +82,7 @@ jobs:
                  -DECALUDP_USE_BUILTIN_GTEST=ON ^
                  -DECALUDP_LIBRARY_TYPE=${{env.ecaludp_library_type}} ^
                  -DECALUDP_ENABLE_NPCAP=${{ matrix.npcap_enabled }} ^
+                 -DCMAKE_CXX_FLAGS=/DASIO_NO_DEPRECATED ^
                  -DCMAKE_INSTALL_PREFIX=${{env.INSTALL_PREFIX}}
 
     - name: Build (Release)

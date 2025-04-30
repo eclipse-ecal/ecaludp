@@ -51,7 +51,7 @@ TEST(EcalUdpSocket, CancelAsyncReceive)
     ASSERT_EQ(ec, asio::error_code());
   }
 
-  auto work = std::make_unique<asio::io_context::work>(io_context);
+  auto work = asio::make_work_guard(io_context);
   std::thread io_thread([&io_context]() { io_context.run(); });
 
   std::shared_ptr<asio::ip::udp::endpoint> sender_endpoint = std::make_shared<asio::ip::udp::endpoint>();
@@ -102,7 +102,7 @@ TEST(EcalUdpSocket, AsyncHelloWorldMessage)
     ASSERT_EQ(ec, asio::error_code());
   }
 
-  auto work = std::make_unique<asio::io_context::work>(io_context);
+  auto work = asio::make_work_guard(io_context);
   std::thread io_thread([&io_context]() { io_context.run(); });
 
   std::shared_ptr<asio::ip::udp::endpoint> sender_endpoint = std::make_shared<asio::ip::udp::endpoint>();
@@ -183,7 +183,7 @@ TEST(EcalUdpSocket, AsyncBigMessage)
     ASSERT_FALSE(ec);
   }
 
-  auto work = std::make_unique<asio::io_context::work>(io_context);
+  auto work = asio::make_work_guard(io_context);
   std::thread io_thread([&io_context]() { io_context.run(); });
 
   std::shared_ptr<asio::ip::udp::endpoint> sender_endpoint = std::make_shared<asio::ip::udp::endpoint>();

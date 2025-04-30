@@ -85,7 +85,7 @@ TEST(FragmentationV5Test, NonFragmentedMessage)
 
   // Create a fake sender endpoint as shared_ptr
   auto sender_endpoint = std::make_shared<asio::ip::udp::endpoint>();
-  sender_endpoint->address(asio::ip::address::from_string("127.0.0.1"));
+  sender_endpoint->address(asio::ip::make_address("127.0.0.1"));
   sender_endpoint->port(1234);
 
   // Reassebly the datagram
@@ -161,7 +161,7 @@ TEST(FragmentationV5Test, FragmentedMessage)
 
   // Create a fake sender endpoint as shared_ptr
   auto sender_endpoint = std::make_shared<asio::ip::udp::endpoint>();
-  sender_endpoint->address(asio::ip::address::from_string("127.0.0.1"));
+  sender_endpoint->address(asio::ip::make_address("127.0.0.1"));
   sender_endpoint->port(1234);
 
   // Reassemble the first datagram
@@ -234,7 +234,7 @@ TEST(FragmentationV5Test, OutOfOrderFragments)
 
   // Create a fake sender endpoint as shared_ptr
   auto sender_endpoint = std::make_shared<asio::ip::udp::endpoint>();
-  sender_endpoint->address(asio::ip::address::from_string("127.0.0.1"));
+  sender_endpoint->address(asio::ip::make_address("127.0.0.1"));
   sender_endpoint->port(1234);
 
   // Reassemble the third datagram
@@ -321,7 +321,7 @@ TEST(FragmentationV5Test, SingleFragmentFragmentation)
 
   // Create a fake sender endpoint as shared_ptr
   auto sender_endpoint = std::make_shared<asio::ip::udp::endpoint>();
-  sender_endpoint->address(asio::ip::address::from_string("127.0.0.1"));
+  sender_endpoint->address(asio::ip::make_address("127.0.0.1"));
   sender_endpoint->port(1234);
 
   // Reassemble the first datagram
@@ -387,7 +387,7 @@ TEST(FragmentationV5Test, ZeroByteMessage)
 
   // Create a fake sender endpoint as shared_ptr
   auto sender_endpoint = std::make_shared<asio::ip::udp::endpoint>();
-  sender_endpoint->address(asio::ip::address::from_string("127.0.0.1"));
+  sender_endpoint->address(asio::ip::make_address("127.0.0.1"));
   sender_endpoint->port(1234);
 
   // Reassebly the datagram
@@ -444,7 +444,7 @@ TEST(FragmentationV5Test, MultiBufferFragmentation)
 
   // Create a fake sender endpoint as shared_ptr
   auto sender_endpoint = std::make_shared<asio::ip::udp::endpoint>();
-  sender_endpoint->address(asio::ip::address::from_string("127.0.0.1"));
+  sender_endpoint->address(asio::ip::make_address("127.0.0.1"));
   sender_endpoint->port(1234);
 
   // Reassemble the first datagram
@@ -533,7 +533,7 @@ TEST(FragmentationV5Test, MultiBufferWithTailingZeroBuffer)
 
   // Create a fake sender endpoint as shared_ptr
   auto sender_endpoint = std::make_shared<asio::ip::udp::endpoint>();
-  sender_endpoint->address(asio::ip::address::from_string("127.0.0.1"));
+  sender_endpoint->address(asio::ip::make_address("127.0.0.1"));
   sender_endpoint->port(1234);
 
   // Reassemble all datagrams
@@ -591,7 +591,7 @@ TEST(FragmentationV5Test, Cleanup)
 
   // Create a fake sender endpoint as shared_ptr
   auto sender_endpoint = std::make_shared<asio::ip::udp::endpoint>();
-  sender_endpoint->address(asio::ip::address::from_string("127.0.0.1"));
+  sender_endpoint->address(asio::ip::make_address("127.0.0.1"));
   sender_endpoint->port(1234);
 
   // Reassemble the first datagram of the first message
@@ -697,7 +697,7 @@ TEST(FragmentationV5Test, FaultyFragmentedMessages)
 
   // Create a fake sender endpoint as shared_ptr
   auto sender_endpoint = std::make_shared<asio::ip::udp::endpoint>();
-  sender_endpoint->address(asio::ip::address::from_string("127.0.0.1"));
+  sender_endpoint->address(asio::ip::make_address("127.0.0.1"));
   sender_endpoint->port(1234);
 
   // Add some way too small fake datagram to the reassembly. This fails, as the datagram cannot even fit a header

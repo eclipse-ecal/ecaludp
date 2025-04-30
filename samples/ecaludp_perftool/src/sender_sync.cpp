@@ -66,7 +66,7 @@ void SenderSync::send_loop()
   }
 
   const std::string message = std::string(parameters_.message_size, 'a');
-  const asio::ip::udp::endpoint destination(asio::ip::address::from_string(parameters_.ip), parameters_.port);
+  const asio::ip::udp::endpoint destination(asio::ip::make_address(parameters_.ip), parameters_.port);
 
   while (true)
   {

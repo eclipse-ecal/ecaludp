@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         library_type: [static, shared, object]
-        os: [ubuntu-22.04, ubuntu-20.04]
+        os: [ubuntu-24.04, ubuntu-22.04]
 
     # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
     # You can convert this to a matrix build if you need cross-platform coverage.
@@ -63,6 +63,7 @@ jobs:
                  -DECALUDP_USE_BUILTIN_GTEST=ON \
                  -DECALUDP_LIBRARY_TYPE=${{env.ecaludp_library_type}} \
                  -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} \
+                 -DCMAKE_CXX_FLAGS=-DASIO_NO_DEPRECATED \
                  -DBUILD_SHARED_LIBS=${{ env.build_shared_libs }}
 
     - name: Build

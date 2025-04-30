@@ -62,7 +62,7 @@ void ReceiverNpcapSync::receive_loop()
     std::exit(1);
   }
 
-  asio::ip::udp::endpoint destination(asio::ip::address::from_string(parameters_.ip), parameters_.port);
+  asio::ip::udp::endpoint destination(asio::ip::make_address(parameters_.ip), parameters_.port);
 
   while (true)
   {

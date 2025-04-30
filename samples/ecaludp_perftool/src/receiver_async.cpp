@@ -70,7 +70,7 @@ void ReceiverAsync::start()
 
   receive_message();
 
-  work_ = std::make_unique<asio::io_context::work>(io_context_);
+  work_ = std::make_unique<work_guard_t>(io_context_.get_executor());
 
   io_context_thread_ = std::make_unique<std::thread>([this](){ io_context_.run(); });
 }
