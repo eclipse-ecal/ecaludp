@@ -27,16 +27,16 @@ jobs:
 
     - name: Set Variables
       run: |
+        # dependencies are always supposed to be built shared, so we set the BUILD_SHARED_LIBS to OFF
+        echo "build_shared_libs=OFF"        >> "$GITHUB_ENV"
+        
         if [[ '${{ matrix.library_type }}' == 'static' ]]; then
-          echo "build_shared_libs=OFF"        >> "$GITHUB_ENV"
           echo "ecaludp_library_type=STATIC"  >> "$GITHUB_ENV"
           echo "package_postfix=static"       >> "$GITHUB_ENV"
         elif [[ '${{ matrix.library_type }}' == 'shared' ]]; then
-          echo "build_shared_libs=ON"         >> "$GITHUB_ENV"
           echo "ecaludp_library_type=SHARED"  >> "$GITHUB_ENV"
           echo "package_postfix=shared"       >> "$GITHUB_ENV"
         elif [[ '${{ matrix.library_type }}' == 'object' ]]; then
-          echo "build_shared_libs=OFF"        >> "$GITHUB_ENV"
           echo "ecaludp_library_type=OBJECT"  >> "$GITHUB_ENV"
           echo "package_postfix=object"       >> "$GITHUB_ENV"
         fi
