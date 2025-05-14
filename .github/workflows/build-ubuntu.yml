@@ -70,7 +70,6 @@ jobs:
                  -DECALUDP_USE_BUILTIN_GTEST=ON \
                  -DECALUDP_LIBRARY_TYPE=${{env.ecaludp_library_type}} \
                  -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} \
-                 -DCMAKE_CXX_FLAGS=-DASIO_NO_DEPRECATED \
                  -DBUILD_SHARED_LIBS=${{ env.build_shared_libs }}
 
     - name: Build
