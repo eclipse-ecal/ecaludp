@@ -34,7 +34,6 @@ jobs:
                  -DECALUDP_USE_BUILTIN_ASIO=ON \
                  -DECALUDP_USE_BUILTIN_RECYCLE=ON \
                  -DECALUDP_USE_BUILTIN_GTEST=ON \
-                 -DCMAKE_CXX_FLAGS=-DASIO_NO_DEPRECATED \
                  -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} \
       shell: bash
 
