@@ -85,7 +85,6 @@ jobs:
                  -DECALUDP_USE_BUILTIN_GTEST=ON ^
                  -DECALUDP_LIBRARY_TYPE=${{env.ecaludp_library_type}} ^
                  -DECALUDP_ENABLE_NPCAP=${{ matrix.npcap_enabled }} ^
-                 -DCMAKE_CXX_FLAGS=/DASIO_NO_DEPRECATED ^
                  -DBUILD_SHARED_LIBS=${{ env.build_shared_libs }} ^
                  -DCMAKE_INSTALL_PREFIX=${{env.INSTALL_PREFIX}}
 
