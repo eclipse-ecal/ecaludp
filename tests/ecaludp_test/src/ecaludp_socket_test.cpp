@@ -260,7 +260,7 @@ TEST(EcalUdpSocket, CancelSyncReceive)
                           asio::error_code ec;
                           auto received_buffer = socket.receive_from(sender_endpoint, 0, ec);
 
-                          #ifdef WIN32
+                          #ifdef _WIN32
                           // We should have received an error
                           // This only happens on Windows! Linux just returns "success"
                           ASSERT_TRUE(ec); 
